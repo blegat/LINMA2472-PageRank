@@ -73,15 +73,19 @@
   % Quentin
 \end{frame}
 \setbeamertemplate{background canvas}{}
-\setbeamertemplate{blocks}[shadow=true]
+\setbeamertemplate{blocks}[rounded][shadow=false]
 \begin{frame}{Search engines}
+\begin{block}{Answer}
 \begin{itemize}
-\item Answer : use of search engines
-
+\item Use of search engines
+\item Centralization : you only need to know the address of the search engine
 \end{itemize}
+\end{block}
 \begin{figure}
-	\includegraphics[width = 8cm]{searchengines.png}
+\centering
+	\includegraphics[width = 8cm]{google-search-result-pages.png}
 \end{figure}
+
 \end{frame}
 \begin{frame}{Early search engines}
 \begin{block}{At first}
@@ -214,29 +218,45 @@ For the world wide web : 50-75 iterations are generally needed
 \end{frame}
 \begin{frame}{Deploying topic sensitive PageRank}
 \begin{block}{Steps for topic sensitive PageRank}
-\textbf{Step 1 : }Decide on the topics\\
-\textbf{Step 2 : }Pick a teleport set S\\
-\textbf{Step 3 : }Relate search queries with a topic(tricky : user chosen, webpages recently searched or bookmarks, facebook,...)\\
-\textbf{Step 4 : }Apply pagerank for selected topic(s)
+\begin{itemize}
+\item Decide on the topics
+\item Pick a teleport set S
+\item Relate search queries with a topic(tricky : user chosen, webpages recently searched or bookmarks, facebook,...)
+\item Apply pagerank for selected topic(s)
+\end{itemize}
+\end{block}
 \end{frame}
 \begin{frame}{Inferring topics from words}
 
 \end{frame}
 \begin{frame}{Hubs and Authorities}
 \end{frame}
-
+\section{Implementation}
 \begin{frame}{Efficient representation of Transition Matrices}
   % Quentin
 \begin{itemize}
 \item M is sparse, represent it by its non-zero elements
 \item For each column : one integer for the out-degree, one integer per non-zero entry
 \end{itemize}
+\textbf{Todo : Application to topic sensitive}
 \end{frame}
+
 \begin{frame}{Use of MapReduce}
-v is too large to fit in main memory -> separate v and separate M in stripes
-The result v' will not fit in main memory either -> separate in blocks
-Use of $k^2$ map tasks, v is transmitted over the network k times, we save time by combining
-Representing a column of blocks takes more space than a stripe but not too much (max 2 times more).
+\begin{center}v  is too large to fit in main memory \end{center}
+\begin{block}{First approach}
+\begin{itemize}
+\item Separate v and separate M in k stripes
+\item Use of k map tasks whose sum is the result of a pagerank iteration
+\item The result v' will not fit in main memory either
+\end{itemize}
+\end{block}
+\begin{block}{Second approach : separate M in blocks}
+\begin{itemize}
+\item Separate v in k parts and M in $k^2$ squares.
+\item Use of $k^2$ map tasks, v is transmitted over the network k times
+\item Representing a column of blocks takes more space than a stripe but not too much (max 2 times more because of the repetition of the out degree)
+\end{itemize}
+\end{block}
 \end{frame}
 \end{document}
 
