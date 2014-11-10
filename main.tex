@@ -9,9 +9,7 @@
 \usepackage{epsfig}
 \usepackage{graphicx}
 
-\usepackage[squaren, Gray]{SIunits}
-\usepackage{sistyle}
-\usepackage[autolanguage]{numprint}
+\usepackage{siunitx}
 
 \usepackage{amsthm}
 \usepackage{amsmath}
@@ -41,6 +39,8 @@
 %\pdfcompresslevel=9
 %\epstopdfsetup{suffix=}
 
+\usepackage[]{algorithm2e}
+
 \title{PageRank}
 \author{
   Quentin Laurent
@@ -48,7 +48,14 @@
   Benoît Legat
 }
 
-\newcommand\si[2]{\numprint[#2]{#1}}
+\newcommand\bigoh{\mathcal{O}}
+
+\usepackage{tikz}
+\tikzstyle{vertex}=[circle,fill=gray!50,minimum size=15pt,inner sep=0pt]
+\tikzstyle{visited}=[circle,fill=green!25,minimum size=15pt,inner sep=0pt]
+\tikzstyle{unvisited}=[circle,fill=blue!25,minimum size=15pt,inner sep=0pt]
+
+
 
 \begin{document}
 
@@ -60,16 +67,243 @@
   % Quentin
 \end{frame}
 
-\begin{frame}{Graph to SCC with DAG}
+\begin{frame}{Strongly Connected Components}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \begin{itemize}
+        \item Strongly Connected Components (SCC) : $\exists$ path $u \to v$ $\forall u,v \in \mathsf{SCC}$.
+        \item Component graph is a Directed Acyclic Graph (DAG).
+        \item Computed on $\bigoh(|V| + |E|)$ with DFS (Tarjan or CLRS).
+          They also toposort the DAG.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{center}
+        \begin{tikzpicture}
+          \node[vertex] at (0, 0) (A) {\tiny $A$};
+          \node[vertex] at (2, 0) (B) {\tiny $B$};
+          \node[vertex] at (1, 1) (C) {\tiny $C$};
+          \node[vertex] at (3, 1) (D) {\tiny $D$};
+          \node[vertex] at (5, 1) (E) {\tiny $E$};
+          \node[vertex] at (4, 0) (F) {\tiny $F$};
+          \node[vertex] at (6, 0) (G) {\tiny $G$};
+          \node[vertex] at (3, -1) (H) {\tiny $H$};
+          \node[vertex] at (2, -2) (I) {\tiny $I$};
+          \node[vertex] at (3, -3) (J) {\tiny $J$};
+          \node[vertex] at (4, -2) (K) {\tiny $K$};
+
+          \draw[->] (A) edge (C);
+          \draw[->] (C) edge (B);
+          \draw[->] (B) edge (A);
+          \draw[->] (C) edge (D);
+          \draw[->] (D) edge (E);
+          \draw[->] (D) edge (F);
+          \draw[->] (E) edge (F);
+          \draw[->] (F) edge (G);
+          \draw[->] (B) edge (I);
+          \draw[->] (K) edge (F);
+          \draw[->] (I) edge (H);
+          \draw[->] (H) edge (K);
+          \draw[->] (K) edge (J);
+          \draw[->] (J) edge (I);
+          \draw[->] (H) edge (J);
+          \draw[->] (H) edge (D);
+          \draw[->] (G) edge (E);
+
+          \draw[dashed] (1, 0.5) circle (1.5);
+          \draw[dashed] (5, 0.5) circle (1.5);
+          \draw[dashed] (3, -2) circle (1.5);
+          \draw[dashed] (3, 1) circle (0.4);
+        \end{tikzpicture}
+      \end{center}
+    \end{column}
+  \end{columns}
+  \begin{center}
+    \begin{tikzpicture}[scale = 0.8]
+      \begin{scope}[xshift=-100]
+        \node[vertex] (n0) at (0, 0) {0};
+        \node[vertex] (n1) at (1, 0) {1};
+        \node[vertex] (n2) at (0, -1) {2};
+        \node[vertex] (n3) at (1, -1) {3};
+        \node[vertex] (n4) at (2, -1) {4};
+        \draw[->] (n0) -- (n1);
+        \draw[->] (n0) -- (n2);
+        \draw[->] (n2) -- (n3);
+        \draw[->] (n1) -- (n3);
+        \draw[->] (n3) -- (n4);
+      \end{scope}
+
+      \begin{scope}
+        \draw[->, anchor=south] (-0.5,-0.5) -- (1,-0.5) node{topological sort} -- (2.5,-0.5);
+      \end{scope}
+
+      \begin{scope}[xshift=100]
+        \node[vertex] (n0) at (0, -0.5) {0};
+        \node[vertex] (n1) at (1, -0.5) {1};
+        \node[vertex] (n2) at (2, -0.5) {2};
+        \node[vertex] (n3) at (3, -0.5) {3};
+        \node[vertex] (n4) at (4, -0.5) {4};
+        \draw[->] (n0) -- (n1);
+        \draw[->] (n0) .. controls (1,-1) .. (n2);
+        \draw[->] (n2) -- (n3);
+        \draw[->] (n1) .. controls (2,0) .. (n3);
+        \draw[->] (n3) -- (n4);
+      \end{scope}
+    \end{tikzpicture}
+\end{center}
+
 \end{frame}
 
 \begin{frame}{Actual Web graph}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item One BIG SCC: ``Main SCC''.
+        \item Tendrils out, Disconnected Components and Out Components:
+          have at least one SCC with no arcs out.
+          \begin{description}
+            \item[dead end] only 1 page in the SCC.
+            \item[spider strap] SCC with more than 1 page.
+          \end{description}
+        \item If Out Components is empty, Main SCC is a spider trap.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[trim=.5cm 0cm .2cm 0cm,clip,width=\linewidth]{web-graph.png}
+        \caption{The ``bowtie'' picture of the Web \cite[p.~187]{leskovec2014mining} (modified).}
+        \label{fig:web-graph}
+      \end{figure}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{Dead end ! Are we dead ? Is it the end ?}
+\begin{frame}{Convergence of PageRank}
+  \begin{block}{Sufficient condition}
+    ``If the graph is \emph{strongly connected} and has no \emph{dead end}, $v$ converge to a limit such that $v = Mv$''
+    \cite[p.~185]{leskovec2014mining}.
+  \end{block}
+  How can we have dead end in a SCC ?  Translation in our case:
+  \begin{block}{Sufficient condition}
+    ``In the Main SCC (everything else empty or removed), $v$ converge to a limit such that $v = Mv$''
+    \cite[p.~185]{leskovec2014mining}.
+  \end{block}
+  % TODO PageRank defined only if there is a limit.. (proof that there is a limit if we start with 1,1,1.. :()
+  %\begin{block}{Quid of dead ends ?}
+    %PageRank of dead end is 0.
+    %     We can have $v = Mv$. As we have seen, component of $v$ leading to a dead end will be 0.
+    %     \begin{proof}
+    %       By induction, if we have a dead end non-zero in $v$, since $v = Mv$, the sum of the components is unchanged so it is 0.
+    %       Therefore, since $v = Mv$, the page linking to it are 0 too, ...
+    %     \end{proof}
+  %\end{block}
+  %\begin{block}{Quid of spider trap ?}
+  %  PageRank of spider trap is maybe not 0.
+    %     \begin{proof}
+    %       There exists a SCC without incoming link (since we have a DAG).
+    %       \begin{itemize}
+    %         \item If all of them are spider trap, we are done.
+    %         \item Otherwise, 
+    %       \end{itemize}
+    %     \end{proof}
+  %\end{block}
+  % FIXME no need for convergence right now, I will prove it
+  %       v_n = ...
+  %       work with that
+  Page rank of all pages is 0 except for pages in spider trap.
+  \begin{proof}
+    Take SCC with no in arcs, sum only gets smaller (no need for strict), therefore Cauchy.
+    In $\mathbb{R}$ so in converges to $\epsilon$.
+    $\epsilon \to 0$.
+  \end{proof}
 \end{frame}
 
-\begin{frame}{Spider traps ! Are we trapped ?}
+\begin{frame}[allowframebreaks]{Solution 1 : pruning}
+  \begin{algorithm}[H]
+    \KwData{DAG $G$}
+    \KwResult{Pruned $G$}
+    \While{$G$ has a node $u$ with no arcs out}{
+      remove incoming arcs of $u$\;
+      remove $u$\;
+    }
+    \caption{Pruning a DAG}
+  \end{algorithm}
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{scope}[xshift=-100]
+        \node[vertex] (n0) at (0, -0.5) {0};
+        \node[vertex] (n1) at (1, -0.5) {1};
+        \node[vertex] (n2) at (2, -0.5) {2};
+        \node[vertex] (n3) at (3, -0.5) {3};
+        \node[vertex] (n4) at (4, -0.5) {4};
+        \draw[->] (n0) -- (n1);
+        \draw[->] (n0) .. controls (1,-1) .. (n2);
+        \draw[->] (n2) -- (n3);
+        \draw[->] (n1) .. controls (2,0) .. (n3);
+        \draw[->] (n3) -- (n4);
+      \end{scope}
+      \begin{scope}[xshift=40]
+        \draw[->, anchor=south] (-0.5,-0.5) -- (0,-0.5) node{prune} -- (0.5,-0.5);
+      \end{scope}
+      \begin{scope}[xshift=70]
+        \node[vertex] (n0) at (0, -0.5) {0};
+        \node[vertex] (n1) at (1, -0.5) {1};
+        \node[vertex] (n2) at (2, -0.5) {2};
+        \node[vertex] (n3) at (3, -0.5) {3};
+        \draw[->] (n0) -- (n1);
+        \draw[->] (n0) .. controls (1,-1) .. (n2);
+        \draw[->] (n2) -- (n3);
+        \draw[->] (n1) .. controls (2,0) .. (n3);
+      \end{scope}
+      \begin{scope}[xshift=110,yshift=-35]
+        \draw[->, anchor=west] (0,0.2) -- (0,0) node{prune} -- (0,-0.2);
+      \end{scope}
+      \begin{scope}[xshift=80,yshift=-40]
+        \node[vertex] (n0) at (0, -0.5) {0};
+        \node[vertex] (n1) at (1, -0.5) {1};
+        \node[vertex] (n2) at (2, -0.5) {2};
+        \draw[->] (n0) -- (n1);
+        \draw[->] (n0) .. controls (1,-1) .. (n2);
+      \end{scope}
+      \begin{scope}[xshift=40,yshift=-40]
+        \draw[->, anchor=south] (0.5,-0.5) -- (0,-0.5) node{prune} -- (-0.5,-0.5);
+      \end{scope}
+      \begin{scope}[xshift=-20,yshift=-40]
+        \node[vertex] (n0) at (0, -0.5) {0};
+        \node[vertex] (n1) at (1, -0.5) {1};
+        \draw[->] (n0) -- (n1);
+      \end{scope}
+      \begin{scope}[xshift=-60,yshift=-40]
+        \draw[->, anchor=south] (0.5,-0.5) -- (0,-0.5) node{prune} -- (-0.5,-0.5);
+      \end{scope}
+      \begin{scope}[xshift=-100,yshift=-40]
+        \node[vertex] (n0) at (0, -0.5) {0};
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+  In our case, we need to stop at the Main SCC.
+  $\bigoh(|V| + |E|)$ using the toposort order.
+
+  \framebreak
+
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Interpretation}
+        We only consider pages in the Main SCC or a page that \emph{indirectly} links to a page in the Main SCC.
+      \end{block}
+      Every node in the In Component will have PageRank 0.
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[trim=.5cm 0cm .2cm 0cm,clip,width=\linewidth]{web-graph-pruned.png}
+        \caption{Pruned Web \cite[p.~187]{leskovec2014mining} (modified).}
+        \label{fig:web-graph}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Solution 2 : Taxation}
 \end{frame}
 
 \begin{frame}{Topic sensitive}
@@ -81,6 +315,19 @@
 
 \begin{frame}{Implementation}
   % Quentin
+\end{frame}
+
+\begin{frame}
+  \begin{thebibliography}{10}
+      \beamertemplatebookbibitems
+    \bibitem{leskovec2014mining}
+      Leskovec, Jure and Rajaraman, Anand and Ullman, Jeffrey David
+      A.~Autor.
+      \newblock {\em Mining of massive datasets}.
+      \newblock 2014.
+      \newblock Cambridge University Press
+      \beamertemplatearticlebibitems
+  \end{thebibliography}
 \end{frame}
 
 \end{document}
