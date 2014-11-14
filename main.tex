@@ -123,7 +123,7 @@
 \begin{frame}{The random web surfer}
   \begin{block}{PageRank takes in account}
     \begin{itemize}
-      \item Likelihood of a random surfer to end up on a particular page 
+      \item Likelihood of a random surfer to end up on a particular page
       \item Content of a page related to the words used in the link to that page \textit{Todo : Comment on prend ça en compte?}
     \end{itemize}
     $\rightarrow$ The users of the web vote for the best pages by placing links to useful websites on their own sites\\
@@ -180,7 +180,7 @@
       $$\begin{vmatrix}
         0 & \frac{1}{2} & 1 & 0 \\
         \frac{1}{3} & 0 & 0 &\frac{1}{2} \\
-        \frac{1}{3} & \frac{1}{2}&  0& 0 
+        \frac{1}{3} & \frac{1}{2}&  0& 0
 
       \end{vmatrix}$$
     \end{column}
@@ -216,6 +216,7 @@
 
 
 \begin{frame}{Strongly Connected Components}
+  \vspace{-.5cm}
   \begin{columns}
     \begin{column}{0.4\textwidth}
       \begin{itemize}
@@ -325,16 +326,40 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Convergence of PageRank}
-  \begin{block}{Sufficient condition}
+\begin{frame}[allowframebreaks]{Perron-Frobenius}
+  \begin{block}{Irreducible matrix}
+    Let $G_A$ be a directed graph where $(i,j) \in E$ iff $A_{ij} > 0$.
+    $A$ is irreducible iff $G_A$ is strongly connected.
+
+    In this case, the period of $A$ is the GCD of the lengths of the closed directed paths
+    of $G_A$ or the number $m$ such that $(A^m)_{ii} > 0$ $\forall i$
+    (which will be at the same time for each $i$ since $A$ is irreducible~\cite{kitchens1998symbolic}).
+  \end{block}
+  \begin{block}{Perron-Frobenius}
+    \begin{itemize}
+      \item If $A_{ij} \geq 0$ $\forall i,j$, $A$ is irreducible with period $h$.
+        There is $h$ eigenvalues s.t. $|\lambda_i| = \rho(A)$.
+        One of them is positive real and its has an eigenvector with only positive real components.
+        They are simple (i.e. $m_a(\lambda_i) = 1$).
+        \[ \min_i \sum_j A_{ij} \leq \rho(A) \leq \max_i \sum_j A_{ij} (= 1 \text{ in our case}) \]
+      \item If $A_{ij} > 0$ $\forall i,j$, everything above is true with $h=1$ since it is irreducible.
+        There is one \emph{simple} positive real eigenvalue $\lambda$ with a eigenvector with only positive real components
+        such that $|\lambda| > |\lambda_i|$ for all $\lambda_i \neq \lambda$.
+    \end{itemize}
+    Since an eigenvector has \emph{positive} real values, if the the $\min \neq \max$,
+    \[ \min_i \sum_j A_{ij} < \rho(A) < \max_i \sum_j A_{ij}. \]
+  \end{block}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Convergence of PageRank}
+  \begin{block}{Sufficient condition from the book}
     ``If the graph is \emph{strongly connected} and has no \emph{dead end}, $v$ converge to a limit such that $v = Mv$''
     \cite[p.~185]{leskovec2014mining}.
   \end{block}
-  How can we have dead end in a SCC ?  Translation in our case:
-  \begin{block}{Sufficient condition}
-    ``In the Main SCC (everything else empty or removed), $v$ converge to a limit such that $v = Mv$''
-    \cite[p.~185]{leskovec2014mining}.
+  \begin{block}{Actual not so sufficient condition}
+    ``In the Main SCC (everything else empty or removed), $v$ \emph{might} converge to a limit such that $v = Mv$''.
   \end{block}
+  Since $h$ is not necessarily one, we don't have the convergence (e.g. bipartie graphs where $h=2$).
   % TODO PageRank defined only if there is a limit.. (proof that there is a limit if we start with 1,1,1.. :()
   %\begin{block}{Quid of dead ends ?}
   %PageRank of dead end is 0.
@@ -350,18 +375,25 @@
   %       There exists a SCC without incoming link (since we have a DAG).
   %       \begin{itemize}
   %         \item If all of them are spider trap, we are done.
-  %         \item Otherwise, 
+  %         \item Otherwise,
   %       \end{itemize}
   %     \end{proof}
   %\end{block}
   % FIXME no need for convergence right now, I will prove it
   %       v_n = ...
   %       work with that
+  \framebreak
+
   Page rank of all pages is 0 except for pages in spider trap.
   \begin{proof}
-    Take SCC with no in arcs, sum only gets smaller (no need for strict), therefore Cauchy.
-    In $\mathbb{R}$ so in converges to $\epsilon$.
-    $\epsilon \to 0$.
+    We have a DAG of SCC so there exists a SCC with no in arcs, its pages have indices in $I$.
+    Let's consider the iteration with $B = A_{I,I}$ and $w=v_I$.
+    If it is not a spider trap, $\max_i \sum_j A_{ij} < 1$.
+    Since $B$ is SC, by Perron-Frobenius,
+    \[ 0 < \rho(B) < 1 \]
+    $w_k$ converges therefore to 0.
+
+    ``Remove'' (needs $\epsilon$ game here) this SCC and iterate.
   \end{proof}
 \end{frame}
 
@@ -438,7 +470,10 @@
       \begin{block}{Interpretation}
         We only consider pages in the Main SCC or a page that \emph{indirectly} links to a page in the Main SCC.
       \end{block}
-      Every node in the In Component will have PageRank 0.
+      Every node in the In Component will have PageRank 0 so we can remove it too for optimization.
+
+      % TODO remettre citer Dangling links Google
+      % TODO still a problem, conv
     \end{column}
     \begin{column}{0.5\textwidth}
       \begin{figure}
@@ -450,7 +485,30 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Solution 2 : Taxation}
+% TODO find contre exemple pour taxation dans cabines
+\begin{frame}[allowframebreaks]{Solution 2 : Taxation}
+  \begin{block}{Intuition}
+    At each iteration, some random walkers get teleported randomly.
+    \begin{description}
+      \item[dead end] ``Fallen'' random walkers can get back in the game.
+      \item[spider trap] Trapped random walkers can escape.
+    \end{description}
+
+    Or: Let's make $A_{ij} > 0$ $\forall i,j$. % TODO le mettre après
+    % TODO speed up convergence ?
+  \end{block}
+  $$v_{k+1} = \beta M v_k + (1 - \beta) e/n$$
+  \begin{block}{Convergence}
+    If we replace zero column (dead end) with $e/n$, with $v_0 = e/n$, $e^T v_k = 1$ for all $k$
+    so $e/n = ee^Tv_k/n$ and the iteration can be written as
+    $$v_{k+1} = (\beta M + (1 - \beta) ee^T/n) v_k.$$
+    The interpretation here is: We make $G_{\beta M + (1 - \beta) ee^T/n}$ complete and therefore SC.
+    $\beta M + (1-\beta) ee^T$ has positive entries so all $\lambda_i \neq 1$ are s.t. $|\lambda_i| < 1$
+    which gives us the convergence.
+
+    Since 1 is \emph{simple}, and $e^T v_k = 1$, it is also unique.
+  \end{block}
+
 \end{frame}
 
 \begin{frame}{Topic sensitive}
@@ -518,19 +576,23 @@
   \begin{thebibliography}{10}
       \beamertemplatebookbibitems
     \bibitem{leskovec2014mining}
-      Leskovec, Jure and Rajaraman, Anand and Ullman, Jeffrey David
-      A.~Autor.
+      Leskovec, Jure and Rajaraman, Anand and Ullman, Jeffrey David.
       \newblock {\em Mining of massive datasets}.
       \newblock 2014.
-      \newblock Cambridge University Press
+      \newblock Cambridge University Press.
       \beamertemplatearticlebibitems
+    \bibitem{kitchens1998symbolic}
+        Kitchens, Bruce.
+        \newblock {\em Symbolic dynamics: one-sided, two-sided and countable state Markov shifts}.
+        \newblock 1998.
+        \newblock Springer.
   \end{thebibliography}
 \end{frame}
 
 
 \end{document}
 
-% Sources images : 
+% Sources images :
 % Gooooooogle : http://triooti.com/2014/08/23/google-nous-cache-des-informations-dans-les-recherches/
 % Web graph : matthewgress.com
 % Pagerank : wikipedia
