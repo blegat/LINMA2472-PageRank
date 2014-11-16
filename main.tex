@@ -177,12 +177,12 @@
       \end{figure}
     \end{column}
     \begin{column}{\paperwidth/2}
-      $$\begin{vmatrix}
+      $$\begin{pmatrix}
         0 & \frac{1}{2} & 1 & 0 \\
         \frac{1}{3} & 0 & 0 &\frac{1}{2} \\
         \frac{1}{3} & \frac{1}{2}&  0& 0 
 
-      \end{vmatrix}$$
+      \end{pmatrix}$$
     \end{column}
   \end{columns}
 \end{frame}
@@ -197,7 +197,7 @@
     After 1 step, 2 steps, ... v becomes $Mv_0$, $M^2v_0$, ...
   \end{block}
   \begin{block}{Does it converge?}
-    We approach a limiting distribution if the graph is strongly connected and there are no dead ends.\\
+    We approach a limiting distribution if the graph is strongly connected (hence there are no dead ends).\\
     v = Mv, v is the principal eigenvector \textit{Todo : proof}
     For the world wide web : 50-75 iterations are generally needed
   \end{block}
@@ -476,12 +476,6 @@
   \end{block}
 \end{frame}
 
-
-\begin{frame}{Inferring topics from words}
-
-\end{frame}
-
-
 \begin{frame}{Hubs and Authorities}
 \end{frame}
 
@@ -489,7 +483,9 @@
 \section{Implementation}
 \begin{frame}{Efficient representation of Transition Matrices}
   % Quentin
+  \begin{block}{URLs and hyperlinks storage}
   \begin{itemize}
+    \item Each URLs is associated with an integer
     \item M is sparse, represent it by its non-zero elements
     \item For each column : one integer for the out-degree, one integer per non-zero entry
   \end{itemize}
