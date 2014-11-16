@@ -73,7 +73,10 @@
 \begin{frame}
   \frametitle{Pagerank : motivation}
   \begin{block}{Where to start searching the web}
-    How to find one's way through the millions of webpages of the web?
+  \begin{itemize}
+    \item How to find one's way through the millions of webpages of the web?
+    \item Access webpage only from a URL or an hyperlink
+    \end{itemize}
   \end{block}
   %\begin{figure}
   %	\includegraphics[width = 8cm]{InternetGraph.png}
@@ -89,6 +92,7 @@
     \begin{itemize}
       \item Use of search engines
       \item Centralization : you only need to know the address of the search engine
+      \item New challenge : order pages by relevancy
     \end{itemize}
   \end{block}
   \begin{figure}
@@ -100,7 +104,7 @@
 
 
 \begin{frame}{Early search engines}
-  \begin{block}{At first}
+  \begin{block}{Naive ordering}
     \begin{itemize}
       \item Early search engine's simply listed the terms in each page, making it easy to fool the search engine using \textbf{term spam}
 
@@ -116,33 +120,13 @@
   \end{block}
 \end{frame}
 
-
-\setbeamertemplate{background canvas}{\includegraphics[height = \paperheight]{surfer.png}}
-\setbeamertemplate{blocks}[rounded][shadow=false]
-\addtobeamertemplate{block begin}{\pgfsetfillopacity{0.7}}{\pgfsetfillopacity{1}}
-\begin{frame}{The random web surfer}
-  \begin{block}{PageRank takes in account}
-    \begin{itemize}
-      \item Likelihood of a random surfer to end up on a particular page
-      \item Content of a page related to the words used in the link to that page \textit{Todo : Comment on prend ça en compte?}
-    \end{itemize}
-    $\rightarrow$ The users of the web vote for the best pages by placing links to useful websites on their own sites\\
-    $\rightarrow$ Has been proved to work empirically
-  \end{block}
-  %\begin{figure}
-  %	\includegraphics[width = 5cm]{surfer.png}
-  %\end{figure}
-\end{frame}
-
-\setbeamertemplate{background canvas}{}
-\setbeamertemplate{blocks}[shadow=true]
-\section{Definition of pagerank}
-\begin{frame}{Definition of pagerank}
-  \begin{columns}
+\begin{frame}{PageRank : a measure of importance}
+\begin{columns}
     \begin{column}{5cm}
       \begin{block}{The internet as a graph}
-        Directed graph $\mathcal{G}$, pages are nodes and there is an arc from p1 to p2 if there is at least one link from p1 to p2
+        Directed graph $\mathcal{G}$, pages are nodes and there is an arc from node p1 to node p2 if there is at least one link from p1 to p2
       \end{block}
+      %TODO : Successeurs predecesseurs
     \end{column}
     \begin{column}{5cm}
       \begin{figure}[r]
@@ -150,68 +134,129 @@
       \end{figure}
     \end{column}
   \end{columns}
+\begin{block}{Importance of a page}
+\begin{itemize}
+\item A page is important if other important pages are its predecessors
+\item Webmasters vote for the best pages by placing links to useful websites on their own sites
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+\setbeamertemplate{background canvas}{\includegraphics[height = \paperheight]{surfer.png}}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\addtobeamertemplate{block begin}{\pgfsetfillopacity{0.7}}{\pgfsetfillopacity{1}}
+\begin{frame}[allowframebreaks]{The random web surfer model}
+  \begin{block}{The random surfer}
+    \begin{itemize}
+      \item Is travelling the web randomly, by following out-links from the webpages he visits
+      \item Given that the surfer is on some page p, each out-link of p has an equal probability to be followed  
+    \end{itemize}
+    $\rightarrow$ Has been proved to work empirically
+  \end{block}
+  \begin{definition}
+  The idealized PageRank of a certain page p is the likelihood of a random surfer to be at page p after following an infinity of links
+  
+  \end{definition}
+  %\begin{figure}
+  %	\includegraphics[width = 5cm]{surfer.png}
+  %\end{figure}
+\end{frame}
+
+\setbeamertemplate{background canvas}{}
+\setbeamertemplate{blocks}[shadow=true]
+\begin{frame}{The random web surfer model : example}
+      \begin{figure}
+      \centering
+        \includegraphics[width = 5cm]{graph1.png}
+      \end{figure}
+\end{frame}
+
+\begin{frame}{The random surfer web model}
+\begin{block}{Probability of being at a certain page p}
+\begin{itemize}
+\item Let $p$ be a node of the web graph, $pos_i$ the location of the random surfer at the $i+1^{th}$ step of the surfer
+$$ P(pos_{i+1}=p) = \sum_{n_i\in V} P(pos_{i+1}=p|pos_{i}=n_i)  P(pos_i = n_i)$$
+\end{itemize}
+\end{block}
+\begin{columns}
+\centering
+\begin{column}{0.5\paperwidth}
+\begin{block}{Probability vector}
+\begin{itemize}
+\item $ v_i = 
+\begin{pmatrix}
+P(pos_i = p_1) \\
+\vdots \\
+P(pos_i = p_n)
+\end{pmatrix}
+$
+\item Random walk is modelled by the iteration $v_{i+1} = M v_i$
+\end{itemize}
+
+\end{block}
+\end{column}
+\begin{column}{0.4\paperwidth}
+$$M = \begin{pmatrix}
+0 & \frac{1}{2} & 1 & 0 \\
+\frac{1}{3} & 0 & 0 & \frac{1}{2} \\
+\frac{1}{3} & 0 & 0 & \frac{1}{2} \\
+\frac{1}{3} & \frac{1}{2} & 0 & 0 \\
+\end{pmatrix}$$
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Definition of PageRank}
   \begin{definition}
     \begin{itemize}
       \item A function that assigns a real number to each page
-      \item It corresponds to the probability of a random surfer of ending up on this particular page after an infinity of steps through the graph
+	\item It is the limiting stationnary distribution of the location of the random surfer
     \end{itemize}
-    $$Pgrk(\mathcal{G}) = v = \begin{vmatrix}v_0\\
-      \vdots \\
-    v_n\end{vmatrix} $$
+    $$Pgrk(\mathcal{G}) = v \:s.t.\: v=Mv $$
   \end{definition}
+  \begin{algorithm}[H]
+    \KwData{Oriented graphe $ G$, start vector $v_0 = \begin{pmatrix} 1/n \\ \vdots \\ 1/n \end{pmatrix}$}
+    \KwResult{PageRank $v$}
+    $v_1 = Mv_0$\;
+    $i=0$\;
+    \While{$||v_{i+1}-v_{i}||>tol$}{
+      $v_{i+1} = M v_i$\;
+      $i++$\;
+    }
+    $v = v_{i}$\;
+    \caption{PageRank}
+  \end{algorithm}
+\end{frame}
 
+\begin{frame}{Remarks}
+\begin{itemize}
+\item This is the power method for eigenvalues
+\item In this case, the sum of the components of each column is 1, no need to norm the iterates
+\item We can chose any initial vector $v_0$ as long as the sum of its components is 1 and it has no zero component, because then $(v_0|v)$ is never zero
+\item This will influe on convergence speed
+\item For the world wide web : 50-75 iterations are generally needed
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Convergence and limiting cases}
+\begin{block}{Convergence}
+Convergence and unicity are guaranteed if the graph is strongly connected
+\end{block}
+\begin{block}{How to deal with particular structures}
+Non-SCC graphs : 
+\begin{itemize}
+\item Dead-ends
+\item Spider traps
+\item ...
+\end{itemize}
+\end{block}
 \end{frame}
 
 
-\begin{frame}{Construction of the transition matrix}
-  \begin{block}{Transition matrix}
-    \begin{itemize}
-      \item Probability of one surfer of going to a linked page is $\frac{1}{l}$ where l is the amount of links leaving that page
-      \item Henceforth the sum of the elements of each column is always 1 if there is at least one vertex leaving each page
-    \end{itemize}
-  \end{block}
-  \begin{columns}
-    \begin{column}{\paperwidth/2}
-      \begin{figure}
-        \includegraphics[width = 5cm]{graph1.png}
-      \end{figure}
-    \end{column}
-    \begin{column}{\paperwidth/2}
-      $$\begin{pmatrix}
-        0 & \frac{1}{2} & 1 & 0 \\
-        \frac{1}{3} & 0 & 0 &\frac{1}{2} \\
-        \frac{1}{3} & \frac{1}{2}&  0& 0
-
-      \end{pmatrix}$$
-    \end{column}
-  \end{columns}
-\end{frame}
 
 
-\begin{frame}{Definition of pagerank}
-  \begin{block}{Probability of distribution for the location of a random surfer}
-    At first : $$v_0 = \begin{vmatrix}\frac{1}{n}\\
-      \vdots \\
-    \frac{1}{n}\end{vmatrix}$$
-    Law of total probability : $P(A) = \sum_n P(A|B_n)P(B_n)$\\
-    After 1 step, 2 steps, ... v becomes $Mv_0$, $M^2v_0$, ...
-  \end{block}
-  \begin{block}{Does it converge?}
-    We approach a limiting distribution if the graph is strongly connected (hence there are no dead ends).\\
-    v = Mv, v is the principal eigenvector \textit{Todo : proof}
-    For the world wide web : 50-75 iterations are generally needed
-  \end{block}
-\end{frame}
 
-
-\begin{frame}{Application to search engine}
-  \begin{itemize}
-    \item \textbf{Collect the data} Web crawlers
-    \item \textbf{Selection of pages} A page needs to satisfy certain criteria to be considered in the pagerank, then other properties are used to determine (ex : search terms in prominent places)
-    \item \textbf{Computation of pagerank} The algorithm described is used to associate a number to each page
-    \item \textbf{Determination of the order on the result page} Each search engine has a secret formula in which pagerank plays an important role
-  \end{itemize}
-\end{frame}
 
 
 
@@ -511,14 +556,31 @@
 
 \end{frame}
 
-\begin{frame}{Topic sensitive}
+\begin{frame}[allowframebreaks]{Topic sensitive}
   % Quentin
+  \begin{block}{Motivation}
+  \begin{itemize}
+  \item Different persons have different interests
+  \item Same search can be expected to yield different results, according to user
+  \end{itemize}
+  \end{block}
+  %TODO : Jaguar
+  \begin{block}{Principle}
+  \begin{itemize}
+  \item Biased random walks for each topic chosen
+  \item For each user we store a vector with his relative interest for each topic
+  \end{itemize}
+  \end{block}
+  \framebreak
   \begin{block}{Biased random walks}
     \begin{itemize}
       \item Same principle as taxation
       \item This time we use a teleport set S relative to a certain topic
     \end{itemize}
     $$ v' = \beta Mv + (1-\beta)e_s/|S|$$
+    \begin{itemize}
+    \item Pages in S will have an increased PageRank as well as the nearby pages
+    \end{itemize}
   \end{block}
 \end{frame}
 
@@ -527,9 +589,9 @@
   \begin{block}{Steps for topic sensitive PageRank}
     \begin{itemize}
       \item Decide on the topics
-      \item Pick a teleport set S
+      \item Pick a teleport set S for each topic
       \item Relate search queries with a topic(tricky : user chosen, webpages recently searched or bookmarks, facebook,...)
-      \item Apply pagerank for selected topic(s)
+      \item Use topic-sensitive pagerank vectors for the ordering of pages(for example, a weighted sum of the vectors)
     \end{itemize}
   \end{block}
 \end{frame}
@@ -548,6 +610,7 @@
     \item For each column : one integer for the out-degree, one integer per non-zero entry
   \end{itemize}
   \textbf{Todo : Application to topic sensitive}
+  \end{block}
 \end{frame}
 
 \begin{frame}{Use of MapReduce}
@@ -568,6 +631,16 @@
   \end{block}
 \end{frame}
 
+\begin{frame}{Application to search engine}
+  \begin{itemize}
+    \item \textbf{Collect the data} Web crawlers
+    \item \textbf{Selection of pages} A page needs to satisfy certain criteria to be considered in the pagerank, then other properties are used to determine (ex : search terms in prominent places)
+    \item \textbf{Computation of pagerank} The algorithm described is used to associate a number to each page
+    \item \textbf{Determination of the order on the result page} Each search engine has a secret formula in which pagerank plays an important role
+  \end{itemize}
+\end{frame}
+
+
 \begin{frame}
   \begin{thebibliography}{10}
       \beamertemplatebookbibitems
@@ -582,6 +655,12 @@
         \newblock {\em Symbolic dynamics: one-sided, two-sided and countable state Markov shifts}.
         \newblock 1998.
         \newblock Springer.
+        
+        \bibitem{GooglePaper}
+        Stanford University
+        \newblock {\em The PageRank Citation Ranking: Bringing Order to the Web}
+        \newblock 1998
+        \newblock  \url{http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf}
   \end{thebibliography}
 \end{frame}
 
