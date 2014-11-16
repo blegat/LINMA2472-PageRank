@@ -78,10 +78,6 @@
     \item Access webpage only from a URL or an hyperlink
     \end{itemize}
   \end{block}
-  %\begin{figure}
-  %	\includegraphics[width = 8cm]{InternetGraph.png}
-  %	\end{figure}
-  % Quentin
 \end{frame}
 
 
@@ -158,9 +154,6 @@
   The idealized PageRank of a certain page p is the likelihood of a random surfer to be at page p after following an infinity of links
   
   \end{definition}
-  %\begin{figure}
-  %	\includegraphics[width = 5cm]{surfer.png}
-  %\end{figure}
 \end{frame}
 
 \setbeamertemplate{background canvas}{}
@@ -254,11 +247,23 @@ Non-SCC graphs :
 \end{frame}
 
 
+\begin{frame}{Power iteration}
+  Let $A$ be a square matrix with eigenvalues $|\lambda_1| \geq |\lambda_2| \geq \cdots |\lambda_n|$ and
+  $v_k$ such that
+  \begin{align*}
+    v_{k+1} & = \frac{Av_k}{\|Av_k\|}\\
+    v_0 & = \sum_{i=1}^n \alpha_i x_i\\
+    v_k & = \sum_{i=1}^n \alpha_i \lambda_i^k x_i\\
+        & = \lambda_1^k \sum_{i=1}^n \alpha_i \left(\frac{\lambda_i}{\lambda_1}\right)^k x_i
+  \end{align*}
+  where for simplicity all eigenvalues are simple.
 
 
+  If $|\lambda_1| > |\lambda_2|$, $\exists \phi_k$ such that $e^{i\phi_k}v_k$ converges (e.g. $\lambda_1 = i$).
 
-
-
+  If $\lambda_k$ is simple, it is unique.
+  Else it depends on the projection of $v_0$ on the space of eigenvectors of $\lambda_1$.
+\end{frame}
 
 \begin{frame}{Strongly Connected Components}
   \vspace{-.5cm}
@@ -371,6 +376,110 @@ Non-SCC graphs :
   \end{columns}
 \end{frame}
 
+\begin{frame}{Dead ends}
+  Links to dead ends are called Dangling links.
+  \begin{block}{Original Google solution \cite[p.~6]{ilprints422}}
+    They can also be undownloaded pages (51 million URL not not downloaded yet in 1999 at Google).
+
+    \begin{itemize}
+      \item Remove dead ends and corresponding Dangling links before computing $A$.
+      \item Compute $A$ and PageRank
+      \item ``After all the PageRanks are calculated, they can be added back in, without affecting things significantly''
+        \cite[p.~6]{ilprints422}.
+    \end{itemize}
+  \end{block}
+  \begin{center}
+    \begin{tikzpicture}[scale = 0.7]
+      \begin{scope}[xshift=-100]
+        \node[vertex] (n0) at (0, -1) {0};
+        \node[vertex] (n1) at (2, -1) {1};
+        \node[vertex] (n2) at (0, 1) {2};
+        \node[vertex] (n3) at (2, 1) {3};
+        \node[vertex] (n4) at (-2, -1) {4};
+        \draw[->] (n1) -- (n2);
+        \draw[->] (n2) -- (n3);
+        \draw[->] (n3) -- (n1);
+        \draw[->] (n2) -- (n0);
+        \draw[->] (n1) -- (n0);
+        \draw[->] (n0) -- (n4);
+      \end{scope}
+
+      \begin{scope}
+        \draw[->, anchor=south] (-0.5,0) -- (1,0) node{Removal} -- (2.5,0);
+      \end{scope}
+
+      \begin{scope}[xshift=100]
+        \node[vertex] (n1) at (2, -1) {1};
+        \node[vertex] (n2) at (0, 1) {2};
+        \node[vertex] (n3) at (2, 1) {3};
+        \draw[->] (n1) -- (n2);
+        \draw[->] (n2) -- (n3);
+        \draw[->] (n3) -- (n1);
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Add an Infinite Improbability Drive on them}
+  \begin{center}
+    \begin{tikzpicture}[scale = 0.7]
+      \begin{scope}[xshift=-100]
+        \node[vertex] (n0) at (0, -1) {0};
+        \node[vertex] (n1) at (2, -1) {1};
+        \node[vertex] (n2) at (0, 1) {2};
+        \node[vertex] (n3) at (2, 1) {3};
+        \node[vertex] (n4) at (-2, -1) {4};
+        \draw[->] (n1) -- (n2);
+        \draw[->] (n2) -- (n3);
+        \draw[->] (n3) -- (n1);
+        \draw[->] (n2) -- (n0);
+        \draw[->] (n1) -- (n0);
+        \draw[->] (n0) -- (n4);
+      \end{scope}
+
+      \begin{scope}
+        \draw[->, anchor=south] (-0.5,0) -- (1,0) node{Add Drive} -- (2.5,0);
+      \end{scope}
+
+      \begin{scope}[xshift=170]
+        \node[vertex] (n0) at (0, -1) {0};
+        \node[vertex] (n1) at (2, -1) {1};
+        \node[vertex] (n2) at (0, 1) {2};
+        \node[vertex] (n3) at (2, 1) {3};
+        \node[vertex] (n4) at (-2, -1) {4};
+        \draw[->] (n1) -- (n2);
+        \draw[->] (n2) -- (n3);
+        \draw[->] (n3) -- (n1);
+        \draw[->] (n2) -- (n0);
+        \draw[->] (n1) -- (n0);
+        \draw[->] (n0) -- (n4);
+        \draw[->] (n4) .. controls (-1,-.5) ..  (n0);
+        \draw[->] (n4) .. controls (0,-2) ..  (n1);
+        \draw[->] (n4) --  (n2);
+        \draw[->] (n4) .. controls (0,2) ..  (n3);
+        \draw[->] (n4) .. controls (-3,-.5) .. (-3,-1) ..  controls (-3,-1.5) .. (n4);
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+  \[
+    \begin{pmatrix}
+      0 & 1/2 & 1/2 & 0 & 0\\
+      0 & 0   & 0   & 1 & 0\\
+      0 & 1/2 & 0   & 0 & 0\\
+      0 & 0   & 1/2 & 0 & 0\\
+      1 & 0   & 0   & 0 & 0
+    \end{pmatrix}
+    \to
+    \begin{pmatrix}
+      0 & 1/2 & 1/2 & 0 & 1/5\\
+      0 & 0 & 0   & 1 & 1/5\\
+      0 & 1/2 & 0   & 0 & 1/5\\
+      0 & 0 & 1/2 & 0 & 1/5\\
+      1 & 0 & 0   & 0 & 1/5
+    \end{pmatrix}
+  \]
+\end{frame}
+
 \begin{frame}[allowframebreaks]{Perron-Frobenius}
   \begin{block}{Irreducible matrix}
     Let $G_A$ be a directed graph where $(i,j) \in E$ iff $A_{ij} > 0$.
@@ -405,28 +514,6 @@ Non-SCC graphs :
     ``In the Main SCC (everything else empty or removed), $v$ \emph{might} converge to a limit such that $v = Mv$''.
   \end{block}
   Since $h$ is not necessarily one, we don't have the convergence (e.g. bipartie graphs where $h=2$).
-  % TODO PageRank defined only if there is a limit.. (proof that there is a limit if we start with 1,1,1.. :()
-  %\begin{block}{Quid of dead ends ?}
-  %PageRank of dead end is 0.
-  %     We can have $v = Mv$. As we have seen, component of $v$ leading to a dead end will be 0.
-  %     \begin{proof}
-  %       By induction, if we have a dead end non-zero in $v$, since $v = Mv$, the sum of the components is unchanged so it is 0.
-  %       Therefore, since $v = Mv$, the page linking to it are 0 too, ...
-  %     \end{proof}
-  %\end{block}
-  %\begin{block}{Quid of spider trap ?}
-  %  PageRank of spider trap is maybe not 0.
-  %     \begin{proof}
-  %       There exists a SCC without incoming link (since we have a DAG).
-  %       \begin{itemize}
-  %         \item If all of them are spider trap, we are done.
-  %         \item Otherwise,
-  %       \end{itemize}
-  %     \end{proof}
-  %\end{block}
-  % FIXME no need for convergence right now, I will prove it
-  %       v_n = ...
-  %       work with that
   \framebreak
 
   Page rank of all pages is 0 except for pages in spider trap.
@@ -440,6 +527,185 @@ Non-SCC graphs :
 
     ``Remove'' (needs $\epsilon$ game here) this SCC and iterate.
   \end{proof}
+\end{frame}
+
+\begin{frame}{Non-convergent example 1}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      $h=4$
+      \[ v_k = \alpha_1 x_1 + \alpha_2 i^k x_2 + \alpha_3 (-1)^k x_3 + \alpha_4 (-i)^k x_4. \]
+      With $v_0 = x_1/4 + x_2/8 + x_4/8$:
+      \[
+        \begin{pmatrix}
+          1/2\\
+          1/4\\
+          0\\
+          1/4
+        \end{pmatrix},
+        \begin{pmatrix}
+          1/4\\
+          1/2\\
+          1/4\\
+          0
+        \end{pmatrix},
+        \begin{pmatrix}
+          0\\
+          1/4\\
+          1/2\\
+          1/4
+        \end{pmatrix},
+        \begin{pmatrix}
+          1/4\\
+          0\\
+          1/4\\
+          1/2
+        \end{pmatrix},\ldots
+      \]
+      With classical $v_0$ ($= x_1/4$ here):
+      \[
+        \begin{pmatrix}
+          1/4\\
+          1/4\\
+          1/4\\
+          1/4
+        \end{pmatrix},
+        \begin{pmatrix}
+          1/4\\
+          1/4\\
+          1/4\\
+          1/4
+        \end{pmatrix},\ldots
+      \]
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{center}
+        \begin{tikzpicture}[scale = 1.5]
+          \node[vertex] (n0) at (0, 1) {0};
+          \node[vertex] (n1) at (1, 1) {1};
+          \node[vertex] (n2) at (1, 0) {2};
+          \node[vertex] (n3) at (0, 0) {3};
+          \draw[->] (n0) -- (n1);
+          \draw[->] (n1) -- (n2);
+          \draw[->] (n2) -- (n3);
+          \draw[->] (n3) -- (n0);
+        \end{tikzpicture}
+      \end{center}
+      \[
+        A =
+        \begin{pmatrix}
+          0 & 0 & 0 & 1\\
+          1 & 0 & 0 & 0\\
+          0 & 1 & 0 & 0\\
+          0 & 0 & 1 & 0
+        \end{pmatrix}
+      \]
+      \[
+        1,
+        \begin{pmatrix}1\\1\\1\\1
+        \end{pmatrix};
+        i,
+        \begin{pmatrix}1\\i\\-1\\-i
+        \end{pmatrix};
+        -1,
+        \begin{pmatrix}1\\-1\\1\\-1
+        \end{pmatrix};
+        -i,
+        \begin{pmatrix}1\\-i\\-1\\i
+        \end{pmatrix}.
+      \]
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Non-convergent example 2}
+  \begin{center}
+    \begin{tikzpicture}[scale = .5]
+      \node[vertex] (n0) at (-4, 1) {0};
+      \node[vertex] (n1) at (0, 1) {1};
+      \node[vertex] (n2) at (4, 1) {2};
+      \node[vertex] (n3) at (-2, -1) {3};
+      \node[vertex] (n4) at ( 2, -1) {4};
+      \draw[->] (n0) -- (n3);
+      \draw[->] (n1) -- (n4);
+      \draw[->] (n2) -- (n4);
+      \draw[->] (n3) -- (n1);
+      \draw[->] (n3) -- (n2);
+      \draw[->] (n4) -- (n0);
+    \end{tikzpicture}
+  \end{center}
+  \[
+    A =
+    \begin{pmatrix}
+      0 & 0 & 0 &   0 & 1\\
+      0 & 0 & 0 & 1/2 & 0\\
+      0 & 0 & 0 & 1/2 & 0\\
+      1 & 0 & 0 & 0   & 0\\
+      0 & 1 & 1 & 0   & 0
+    \end{pmatrix}
+  \]
+  \[
+    1,
+    \begin{pmatrix}1/4\\1/8\\1/8\\1/4\\1/4
+    \end{pmatrix};
+    i,
+    \begin{pmatrix}-i\\i/2\\i/2\\-1\\1
+    \end{pmatrix};
+    -1,
+    \begin{pmatrix}-1\\-1/2\\-1/2\\1\\1
+    \end{pmatrix};
+    -i,
+    \begin{pmatrix}i\\-i/2\\-i/2\\-1\\1
+    \end{pmatrix};
+    0,
+    \begin{pmatrix}0\\1\\-1\\0\\0
+    \end{pmatrix}.
+  \]
+  \framebreak
+
+  $h=4$
+  \[
+    v_k = \alpha_1 x_1 + \alpha_2 i^k x_2 + \alpha_3 (-1)^k x_3 + \alpha_4 (-i)^k x_4.
+  \]
+  With classical $v_0$ ($= x_1-x_2i/20-x_3/20+x_4i/20$ here):
+  \[
+    \begin{pmatrix}
+      0.2\\
+      0.2\\
+      0.2\\
+      0.2\\
+      0.2
+    \end{pmatrix},
+    \begin{pmatrix}
+      0.2\\
+      0.1\\
+      0.1\\
+      0.2\\
+      0.4
+    \end{pmatrix},
+    \begin{pmatrix}
+      0.4\\
+      0.1\\
+      0.1\\
+      0.2\\
+      0.2
+    \end{pmatrix},
+    \begin{pmatrix}
+      0.2\\
+      0.1\\
+      0.1\\
+      0.4\\
+      0.2
+    \end{pmatrix},
+    \begin{pmatrix}
+      0.2\\
+      0.2\\
+      0.2\\
+      0.2\\
+      0.2
+    \end{pmatrix}
+    ,\ldots
+  \]
+
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Solution 1 : pruning}
@@ -505,7 +771,7 @@ Non-SCC graphs :
       \end{scope}
     \end{tikzpicture}
   \end{center}
-  In our case, we need to stop at the Main SCC.
+  In our case, we need to keep the Main SCC.
   $\bigoh(|V| + |E|)$ using the toposort order.
 
   \framebreak
@@ -517,7 +783,6 @@ Non-SCC graphs :
       \end{block}
       Every node in the In Component will have PageRank 0 so we can remove it too for optimization.
 
-      % TODO remettre citer Dangling links Google
       % TODO still a problem, conv
     \end{column}
     \begin{column}{0.5\textwidth}
@@ -544,7 +809,10 @@ Non-SCC graphs :
   \end{block}
   $$v_{k+1} = \beta M v_k + (1 - \beta) e/n$$
   \begin{block}{Convergence}
-    If we replace zero column (dead end) with $e/n$, with $v_0 = e/n$, $e^T v_k = 1$ for all $k$
+    If we add Infinite Improbability Drives on dead ends,
+    zero columns become $e/n$.
+    If $v_0$ is stochastic (non-negative elements with sum 1),
+    $e^T v_k = 1$ for all $k$
     so $e/n = ee^Tv_k/n$ and the iteration can be written as
     $$v_{k+1} = (\beta M + (1 - \beta) ee^T/n) v_k.$$
     The interpretation here is: We make $G_{\beta M + (1 - \beta) ee^T/n}$ complete and therefore SC.
@@ -555,7 +823,7 @@ Non-SCC graphs :
   \end{block}
 
 \end{frame}
-
+\section{Topic-sensitive pagerank}
 \begin{frame}[allowframebreaks]{Topic sensitive}
   % Quentin
   \begin{block}{Motivation}
@@ -596,9 +864,49 @@ Non-SCC graphs :
   \end{block}
 \end{frame}
 
-\begin{frame}{Hubs and Authorities}
+
+\section{Link Spam}
+\begin{frame}{Link Spam}
+\begin{block}{A new kind of spam}
+\begin{itemize}
+\item Pagerank solved the problem of term spam, spammers look for other ways to get a better score
+\item Link spam : build a set of m supporting pages to increase the rank of a target page t
+\end{itemize}
+\end{block}
+\begin{figure}
+\centering
+	\includegraphics[width=7cm]{SpamFarm.png}
+\caption{A spammer's view of the web}
+\end{figure}
 \end{frame}
 
+\begin{frame}{Spam farm analysis}
+\begin{block}{PageRank of the target page}
+\begin{itemize}
+\item Let $x$ be the input PageRank from the rest of the web, $m$ the number of supporting pages and $n$ the size of the web
+\item The PageRank $y$ of $t$ is given by
+$ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
+\item If $\beta=.85$ (classical), $\frac{1}{1-\beta^2} = 3.6$ and $\frac{\beta}{1+\beta} = 0.46$
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{TrustRank and Spam Mass}
+\begin{block}{TrustRank}
+\begin{itemize}
+\item Topic sensitive applied to a set of pages deemed trustworthy(inaccessible for the spammers)
+\item Trust set determined by humans, or trusted domain names (.gov, .mil in the U.S.)
+\end{itemize}
+\end{block}
+\begin{block}{Spam Mass}
+\begin{itemize}
+\item Intuition : Portion of the PageRank due to spam
+\item Page $p$ with PageRank $r$ and TrustRank $t$
+\item Spam Mass of $p = \frac{r-t}{t}$
+\item Remove pages with a high Spam Mass from results ordering
+\end{itemize}
+\end{block}
+\end{frame}
 
 \section{Implementation}
 \begin{frame}{Efficient representation of Transition Matrices}
@@ -609,12 +917,10 @@ Non-SCC graphs :
     \item M is sparse, represent it by its non-zero elements
     \item For each column : one integer for the out-degree, one integer per non-zero entry
   \end{itemize}
-  \textbf{Todo : Application to topic sensitive}
   \end{block}
 \end{frame}
 
 \begin{frame}{Use of MapReduce}
-\begin{center}v  is too large to fit in main memory \end{center}
   \begin{block}{First approach}
     \begin{itemize}
       \item Separate v and separate M in k stripes
@@ -630,16 +936,32 @@ Non-SCC graphs :
     \end{itemize}
   \end{block}
 \end{frame}
-
 \begin{frame}{Application to search engine}
   \begin{itemize}
     \item \textbf{Collect the data} Web crawlers
     \item \textbf{Selection of pages} A page needs to satisfy certain criteria to be considered in the pagerank, then other properties are used to determine (ex : search terms in prominent places)
     \item \textbf{Computation of pagerank} The algorithm described is used to associate a number to each page
     \item \textbf{Determination of the order on the result page} Each search engine has a secret formula in which pagerank plays an important role
-  \end{itemize}
+    \end{itemize}
 \end{frame}
 
+\begin{frame}{Hubs and Authorities}
+  \begin{itemize}
+    \item Hubs have links to interesting authorities.
+    \item Autorities are linked to by good hubs.
+  \end{itemize}
+  We take $L^T$ which is \emph{exactly} the adjacency matrix.
+  \begin{align*}
+    a_{k+1} & = \alpha_k L^T h_k\\
+    h_{k+1} & = \beta_k  L a_{k+1}
+  \end{align*}
+  where $\alpha_k, \beta_k$ are scaling factors (since the matrix is no more stochastic)
+  such that
+  \begin{itemize}
+    \item largest element is 1 or
+    \item sum of elements is 1
+  \end{itemize}
+\end{frame}
 
 \begin{frame}
   \begin{thebibliography}{10}
@@ -654,13 +976,18 @@ Non-SCC graphs :
         Kitchens, Bruce.
         \newblock {\em Symbolic dynamics: one-sided, two-sided and countable state Markov shifts}.
         \newblock 1998.
-        \newblock Springer.
-        
+        \newblock Springer.        
         \bibitem{GooglePaper}
         Stanford University
         \newblock {\em The PageRank Citation Ranking: Bringing Order to the Web}
         \newblock 1998
         \newblock  \url{http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf}
+      \beamertemplatearticlebibitems
+    \bibitem{ilprints422}
+        Lawrence Page and Sergey Brin and Rajeev Motwani and Terry Winograd.
+        \newblock {\em The PageRank Citation Ranking: Bringing Order to the Web}.
+        \newblock {1999}.
+        \newblock {Stanford InfoLab}.
   \end{thebibliography}
 \end{frame}
 
