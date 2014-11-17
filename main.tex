@@ -146,13 +146,13 @@
   \begin{block}{The random surfer}
     \begin{itemize}
       \item Is travelling the web randomly, by following out-links from the webpages he visits
-      \item Given that the surfer is on some page p, each out-link of p has an equal probability to be followed  
+      \item Given that the surfer is on some page p, each out-link of p has an equal probability to be followed
     \end{itemize}
     $\rightarrow$ Has been proved to work empirically
   \end{block}
   \begin{definition}
   The idealized PageRank of a certain page p is the likelihood of a random surfer to be at page p after following an infinity of links
-  
+
   \end{definition}
 \end{frame}
 
@@ -177,7 +177,7 @@ $$ P(pos_{i+1}=p) = \sum_{n_i\in V} P(pos_{i+1}=p|pos_{i}=n_i)  P(pos_i = n_i)$$
 \begin{column}{0.5\paperwidth}
 \begin{block}{Probability vector}
 \begin{itemize}
-\item $ v_i = 
+\item $ v_i =
 \begin{pmatrix}
 P(pos_i = p_1) \\
 \vdots \\
@@ -237,7 +237,7 @@ $$M = \begin{pmatrix}
 Convergence and unicity are guaranteed if the graph is strongly connected
 \end{block}
 \begin{block}{How to deal with particular structures}
-Non-SCC graphs : 
+Non-SCC graphs :
 \begin{itemize}
 \item Dead-ends
 \item Spider traps
@@ -248,10 +248,10 @@ Non-SCC graphs :
 
 
 \begin{frame}{Power iteration}
-  Let $A$ be a square matrix with eigenvalues $|\lambda_1| \geq |\lambda_2| \geq \cdots |\lambda_n|$ and
+  Let $M$ be a square matrix with eigenvalues $|\lambda_1| \geq |\lambda_2| \geq \cdots |\lambda_n|$ and
   $v_k$ such that
   \begin{align*}
-    v_{k+1} & = \frac{Av_k}{\|Av_k\|}\\
+    v_{k+1} & = \frac{Mv_k}{\|Mv_k\|}\\
     v_0 & = \sum_{i=1}^n \alpha_i x_i\\
     v_k & = \sum_{i=1}^n \alpha_i \lambda_i^k x_i\\
         & = \lambda_1^k \sum_{i=1}^n \alpha_i \left(\frac{\lambda_i}{\lambda_1}\right)^k x_i
@@ -382,8 +382,8 @@ Non-SCC graphs :
     They can also be undownloaded pages (51 million URL not not downloaded yet in 1999 at Google).
 
     \begin{itemize}
-      \item Remove dead ends and corresponding Dangling links before computing $A$.
-      \item Compute $A$ and PageRank
+      \item Remove dead ends and corresponding Dangling links before computing $M$.
+      \item Compute $M$ and PageRank
       \item ``After all the PageRanks are calculated, they can be added back in, without affecting things significantly''
         \cite[p.~6]{ilprints422}.
     \end{itemize}
@@ -421,6 +421,8 @@ Non-SCC graphs :
 \end{frame}
 
 \begin{frame}{Add an Infinite Improbability Drive on them}
+  $M$ is $A^T$ where $A$ is the ``stochastic'' adjacency matrix.
+  $(1,e)$ is an eigenpair of $A$ if there are no dead ends.
   \begin{center}
     \begin{tikzpicture}[scale = 0.7]
       \begin{scope}[xshift=-100]
@@ -482,26 +484,26 @@ Non-SCC graphs :
 
 \begin{frame}[allowframebreaks]{Perron-Frobenius}
   \begin{block}{Irreducible matrix}
-    Let $G_A$ be a directed graph where $(i,j) \in E$ iff $A_{ij} > 0$.
-    $A$ is irreducible iff $G_A$ is strongly connected.
+    Let $G_M$ be a directed graph where $(i,j) \in E$ iff $M_{ij} > 0$.
+    $M$ is irreducible iff $G_M$ is strongly connected.
 
-    In this case, the period of $A$ is the GCD of the lengths of the closed directed paths
-    of $G_A$ or the number $m$ such that $(A^m)_{ii} > 0$ $\forall i$
-    (which will be at the same time for each $i$ since $A$ is irreducible~\cite{kitchens1998symbolic}).
+    In this case, the period of $M$ is the GCD of the lengths of the closed directed paths
+    of $G_M$ or the number $m$ such that $(M^m)_{ii} > 0$ $\forall i$
+    (which will be at the same time for each $i$ since $M$ is irreducible~\cite{kitchens1998symbolic}).
   \end{block}
   \begin{block}{Perron-Frobenius}
     \begin{itemize}
-      \item If $A_{ij} \geq 0$ $\forall i,j$, $A$ is irreducible with period $h$.
-        There is $h$ eigenvalues s.t. $|\lambda_i| = \rho(A)$.
+      \item If $M_{ij} \geq 0$ $\forall i,j$, $M$ is irreducible with period $h$.
+        There is $h$ eigenvalues s.t. $|\lambda_i| = \rho(M)$.
         One of them is positive real and its has an eigenvector with only positive real components.
         They are simple (i.e. $m_a(\lambda_i) = 1$).
-        \[ \min_i \sum_j A_{ij} \leq \rho(A) \leq \max_i \sum_j A_{ij} (= 1 \text{ in our case}) \]
-      \item If $A_{ij} > 0$ $\forall i,j$, everything above is true with $h=1$ since it is irreducible.
+        \[ \min_i \sum_j M_{ij} \leq \rho(M) \leq \max_i \sum_j M_{ij} (= 1 \text{ in our case}) \]
+      \item If $M_{ij} > 0$ $\forall i,j$, everything above is true with $h=1$ since it is irreducible.
         There is one \emph{simple} positive real eigenvalue $\lambda$ with a eigenvector with only positive real components
         such that $|\lambda| > |\lambda_i|$ for all $\lambda_i \neq \lambda$.
     \end{itemize}
     Since an eigenvector has \emph{positive} real values, if the the $\min \neq \max$,
-    \[ \min_i \sum_j A_{ij} < \rho(A) < \max_i \sum_j A_{ij}. \]
+    \[ \min_i \sum_j M_{ij} < \rho(M) < \max_i \sum_j M_{ij}. \]
   \end{block}
 \end{frame}
 
@@ -519,8 +521,8 @@ Non-SCC graphs :
   Page rank of all pages is 0 except for pages in spider trap.
   \begin{proof}
     We have a DAG of SCC so there exists a SCC with no in arcs, its pages have indices in $I$.
-    Let's consider the iteration with $B = A_{I,I}$ and $w=v_I$.
-    If it is not a spider trap, $\max_i \sum_j A_{ij} < 1$.
+    Let's consider the iteration with $B = M_{I,I}$ and $w=v_I$.
+    If it is not a spider trap, $\max_i \sum_j M_{ij} < 1$.
     Since $B$ is SC, by Perron-Frobenius,
     \[ 0 < \rho(B) < 1 \]
     $w_k$ converges therefore to 0.
@@ -591,7 +593,7 @@ Non-SCC graphs :
         \end{tikzpicture}
       \end{center}
       \[
-        A =
+        M =
         \begin{pmatrix}
           0 & 0 & 0 & 1\\
           1 & 0 & 0 & 0\\
@@ -634,7 +636,7 @@ Non-SCC graphs :
     \end{tikzpicture}
   \end{center}
   \[
-    A =
+    M =
     \begin{pmatrix}
       0 & 0 & 0 &   0 & 1\\
       0 & 0 & 0 & 1/2 & 0\\
@@ -783,7 +785,7 @@ Non-SCC graphs :
       \end{block}
       Every node in the In Component will have PageRank 0 so we can remove it too for optimization.
 
-      % TODO still a problem, conv
+      Still we could have $h > 1$. Convergence not guaranteed.
     \end{column}
     \begin{column}{0.5\textwidth}
       \begin{figure}
@@ -804,15 +806,13 @@ Non-SCC graphs :
       \item[spider trap] Trapped random walkers can escape.
     \end{description}
 
-    Or: Let's make $A_{ij} > 0$ $\forall i,j$. % TODO le mettre après
-    % TODO speed up convergence ?
+    Or: Let's make $M_{ij} > 0$ $\forall i,j$. % TODO le mettre après
   \end{block}
   $$v_{k+1} = \beta M v_k + (1 - \beta) e/n$$
   \begin{block}{Convergence}
-    If we add Infinite Improbability Drives on dead ends,
-    zero columns become $e/n$.
+    We remove dead ends or add Infinite Improbability Drives on dead ends so that $e^TM = 1$.
     If $v_0$ is stochastic (non-negative elements with sum 1),
-    $e^T v_k = 1$ for all $k$
+    $e^T v_k = e^TM^kv_k = e^Tv_0 = 1$ for all $k$
     so $e/n = ee^Tv_k/n$ and the iteration can be written as
     $$v_{k+1} = (\beta M + (1 - \beta) ee^T/n) v_k.$$
     The interpretation here is: We make $G_{\beta M + (1 - \beta) ee^T/n}$ complete and therefore SC.
@@ -821,14 +821,40 @@ Non-SCC graphs :
 
     Since 1 is \emph{simple}, and $e^T v_k = 1$, it is also unique.
   \end{block}
+
+  The eigenvector has only positive entries.
+  Spider Traps have become harmless.
+  \begin{block}{Haven't dead ends become harmless}
+    If we leave dead ends untouched.
+    There is a guarantee that there is no convergence with $\beta < 1$.
+    \begin{proof}
+      By contradiction.
+      Let $u = \lim_{k \to \infty} v_k$ and node $x$ be a dead end.
+      $u$ has only non-negative entry (by induction, $\mathbb{R}_+$ is closed).
+      $$u = \beta M u + (1 - \beta) e/n$$
+      so $u_x \geq (1-\beta)/n$.
+      \begin{align*}
+        e^Tu & = \beta e^TM u + (1-\beta) e^Te/n\\
+             & = \beta e^TM u + (1 - \beta)\\
+             & < e^T u
+      \end{align*}
+      because $u_x > 0$ and $(e^TM)_x < 1$.
+    \end{proof}
+  \end{block}
 \end{frame}
 
 \begin{frame}
   \begin{block}{Speed of calculation \cite[p.~12]{langville2004deeper}}
-    If $A$ has spectrum $\{1,\lambda_2,\ldots\}$.
-    the spectrum of $\beta A + (1-\beta)e/n$.
+    If $M$ has spectrum $\{1,\lambda_2,\ldots\}$.
+    the spectrum of $\beta M + (1-\beta)e_S/n$.
     $\{1,\beta\lambda_2,\beta\lambda_3,\ldots,\beta\lambda_n\}$.
+    \begin{proof}
+      Consequence that $(1,e)$ is an eigenpair of $M^T$,
+      see \cite[p.~12]{langville2004deeper}.
+    \end{proof}
   \end{block}
+  Since $|\lambda_2| \leq 1$, we have $\bigoh(\beta)$.
+  Trade-off between speed and relevant PageRank.
 \end{frame}
 \section{Topic-sensitive pagerank}
 \begin{frame}[allowframebreaks]{Topic sensitive}
@@ -882,7 +908,7 @@ Non-SCC graphs :
 \end{block}
 \begin{figure}
 \centering
-	\includegraphics[width=7cm]{SpamFarm.png}
+	%\includegraphics[width=7cm]{SpamFarm.png}
 \caption{A spammer's view of the web}
 \end{figure}
 \end{frame}
@@ -973,11 +999,17 @@ $ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
 
 \begin{frame}{Convergence of Hubs and Authorities}
   All entries are non-negatives.
+  Matrix becomes $L^TL$.
 
-  $L^TT$ is symetric so connected implies strongly connected.
+  $(L^TL)^T = L^TL$ so $L^TL$ is symetric and therefore connected implies strongly connected.
+  Can also be seen by:
+  $(L^TL)_{ij} > 0$ iff $i$ and $j$ links to a same page in $G_{L^TL}$.
 
-  There is trivial closed path of length 2 so $h = 1$ or 2.
-  If at least one closed path of length odd, $h = 1$ and convergence is guaranteed.
+  Spider traps no more exists and dead ends are not in connected components so affect no one.
+
+  In each connected component (except dead ends ones).
+  The diagonal is positive so $h = 1$ (each node has a loop).
+  Convergence is guaranteed.
 \end{frame}
 
 \begin{frame}
@@ -993,7 +1025,7 @@ $ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
         Kitchens, Bruce.
         \newblock {\em Symbolic dynamics: one-sided, two-sided and countable state Markov shifts}.
         \newblock 1998.
-        \newblock Springer.        
+        \newblock Springer.
         \bibitem{GooglePaper}
         Stanford University
         \newblock {\em The PageRank Citation Ranking: Bringing Order to the Web}
