@@ -787,7 +787,14 @@
 
     Since 1 is \emph{simple}, and $e^T v_k = 1$, it is also unique.
   \end{block}
+\end{frame}
 
+\begin{frame}
+  \begin{block}{Speed of calculation \cite[p.~12]{langville2004deeper}}
+    If $A$ has spectrum $\{1,\lambda_2,\ldots\}$.
+    the spectrum of $\beta A + (1-\beta)e/n$.
+    $\{1,\beta\lambda_2,\beta\lambda_3,\ldots,\beta\lambda_n\}$.
+  \end{block}
 \end{frame}
 
 \begin{frame}{Topic sensitive}
@@ -852,7 +859,8 @@
     \item Hubs have links to interesting authorities.
     \item Autorities are linked to by good hubs.
   \end{itemize}
-  We take $L^T$ which is \emph{exactly} the adjacency matrix.
+  We take $L^T$ which is \emph{exactly} the adjacency matrix, no division by $l$:
+  the more you have links the more interesting your are.
   \begin{align*}
     a_{k+1} & = \alpha_k L^T h_k\\
     h_{k+1} & = \beta_k  L a_{k+1}
@@ -865,6 +873,14 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Convergence of Hubs and Authorities}
+  All entries are non-negatives.
+
+  $L^TT$ is symetric so connected implies strongly connected.
+
+  There is trivial closed path of length 2 so $h = 1$ or 2.
+  If at least one closed path of length odd, $h = 1$ and convergence is guaranteed.
+\end{frame}
 
 \begin{frame}
   \begin{thebibliography}{10}
@@ -886,6 +902,12 @@
         \newblock {\em The PageRank Citation Ranking: Bringing Order to the Web}.
         \newblock {1999}.
         \newblock {Stanford InfoLab}.
+      \beamertemplatearticlebibitems
+    \bibitem{langville2004deeper}
+        Langville, Amy N and Meyer, Carl D.
+        \newblock {\em Deeper inside pagerank}.
+        \newblock {2004}.
+        \newblock {Taylor \& Francis}.
   \end{thebibliography}
 \end{frame}
 
