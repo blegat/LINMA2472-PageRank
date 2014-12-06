@@ -1,0 +1,31 @@
+Question:
+Si P donné, et E_notP et E_in donné,
+comment maximiser ||pi_P||_1 en choisissant E_out et E_P
+
+Quentin 1) Si on maximise ||pi_P||_inf, ça change quoi ?
+Benoît  2) Comment améliorer n_P! * |parents de P| * complexité de PageRank (ou d'abord calculer V)
+Quentin 3) Si 1 accès à un forum, vaut-il mieux pas ajouter, vers qui ou ajouter plusieurs, vers qui
+Benoît  4) Cas particulier où |P| = 1, |P| = 2 ?
+Quentin 5) What to do si on a pas tout l'info sur le graphe: ex. in-links et classement des pages
+Benoît  6) Si on peut pas faire de boucle, qu'est-ce que ça change
+Quentin 7) Prove corollaire 16,17,18
+
+Erreurs dans Maximizing:
+Preuve thm 5, il faut le faire strictement:
+v -> u
+e_P -> e_i
+Puis on fait le lemme 1
+u_j <= c u_i < u_i
+u_j < u_i => sum u_j/tilde d_i < u_i sum... = u_i
+Si on le prouve pas, on divise par 0 dans le Lemme 4
+
+Proposition 7, il faut imposer d_i > 1 sinon on divise par 0
+
+Page 15 dans preuve du thm 11 ds paragraphe après eq (6), 4th line,
+c'est
+v_l = min v_j < v_i <= v_k
+à la place
+v_l = min v_j < v_k <= v_i
+
+Truc bizarre:
+Pourquoi proposition 7 dit pas qu'il faut tout virer et contredit le thm 12 ?

@@ -32,6 +32,7 @@
 %\newcommand{\newblock}{}
 
 \usetheme{Warsaw}
+\setbeamertemplate{headline}{}
 
 \usepackage{graphicx}
 \usepackage{epsfig}
@@ -123,7 +124,7 @@
 \begin{columns}
     \begin{column}{5cm}
       \begin{block}{The internet as a graph}
-        Directed graph $\mathcal{G}=(\mathcal{V},\mathcal{E})$, pages are nodes and there is an arc from node p1 to node p2 if there is at least one link from p1 to p2
+        Directed graph $\mathcal{G}=(\mathcal{V},\mathcal{E})$, pages are nodes and there is an arc from node $p_1$ to node $p_2$ if there is at least one link from $p_1$ to $p_2$
       \end{block}
       %TODO : Successeurs predecesseurs
     \end{column}
@@ -149,12 +150,12 @@
   \begin{block}{The random surfer}
     \begin{itemize}
       \item Is travelling the web randomly, by following out-links from the webpages he visits
-      \item Given that the surfer is on some page p, each out-link of p has an equal probability to be followed
+      \item Given that the surfer is on some page $p$, each out-link of p has an equal probability to be followed
     \end{itemize}
     $\rightarrow$ Has been proved to work empirically
   \end{block}
   \begin{definition}
-  The idealized PageRank of a certain page p is the likelihood of a random surfer to be at page p after following an infinity of links
+  The idealized PageRank of a certain page $p$ is the likelihood of a random surfer to be at page $p$ after following an infinity of links
 
   \end{definition}
 \end{frame}
@@ -169,9 +170,9 @@
 \end{frame}
 
 \begin{frame}{The random surfer web model}
-\begin{block}{Probability of being at a certain page p}
+\begin{block}{Probability of being at a certain page $p$}
 \begin{itemize}
-\item Let $p$ be a node of the web graph, $pos_i$ the location of the random surfer at the $i+1^{th}$ step of the surfer
+\item Let $p$ be a node of the web graph, $pos_i$ the location of the random surfer at the $i^{th}$ step of the random surfing
 $$ P(pos_{i+1}=p) = \sum_{n_i\in V} P(pos_{i+1}=p|pos_{i}=n_i)  P(pos_i = n_i)$$
 \end{itemize}
 \end{block}
@@ -203,7 +204,7 @@ $$M = \begin{pmatrix}
 \end{columns}
 \end{frame}
 
-\begin{frame}{Definition of PageRank}
+\begin{frame}[allowframebreaks]{Definition of PageRank}
   \begin{definition}
     \begin{itemize}
       \item A function that assigns a real number to each page
@@ -211,12 +212,13 @@ $$M = \begin{pmatrix}
     \end{itemize}
     $$Pgrk(\mathcal{G}) = v \:s.t.\: v=Mv $$
   \end{definition}
+  \framebreak
   \begin{algorithm}[H]
     \KwData{Oriented graphe $ G$, start vector $v_0 = \begin{pmatrix} 1/n \\ \vdots \\ 1/n \end{pmatrix}$}
     \KwResult{PageRank $v$}
     $v_1 = Mv_0$\;
-    $i=0$\;
-    \While{$||v_{i+1}-v_{i}||>tol$}{
+    $i=1$\;
+    \While{$||v_{i}-v_{i-1}||>tol$}{
       $v_{i+1} = M v_i$\;
       $i++$\;
     }
@@ -235,25 +237,25 @@ $$M = \begin{pmatrix}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Convergence and limiting cases}
-\begin{block}{Convergence}
-Convergence and unicity are guaranteed if the graph is strongly connected
-\end{block}
-\begin{block}{How to deal with particular structures}
-Non-SCC graphs :
-\begin{itemize}
-\item Dead-ends
-\item Spider traps
-\item ...
-\end{itemize}
-\end{block}
-\end{frame}
+% \begin{frame}{Convergence and limiting cases}
+% \begin{block}{Convergence}
+% Convergence and unicity are guaranteed if the graph is strongly connected
+% \end{block}
+% \begin{block}{How to deal with particular structures}
+% Non-SCC graphs :
+% \begin{itemize}
+% \item Dead-ends
+% \item Spider traps
+% \item ...
+% \end{itemize}
+% \end{block}
+% \end{frame}
 
 \section{Deeper into PageRank}
 \begin{frame}
   \tableofcontents[currentsection]
 \end{frame}
-\begin{frame}{Power iteration}
+\begin{frame}[allowframebreaks]{Power iteration}
   Let $M$ be a square matrix with eigenvalues $|\lambda_1| \geq |\lambda_2| \geq \cdots |\lambda_n|$ and
   $v_k$ such that
   \begin{align*}
@@ -265,15 +267,16 @@ Non-SCC graphs :
   where for simplicity all eigenvalues are simple.
   Convergence is $\bigoh(\lambda_2/\lambda_1)$.
 
+  \framebreak
 
-  If $|\lambda_1| > |\lambda_2|$, $\exists \phi_k$ such that $e^{i\phi_k}v_k$ converges (e.g. $\lambda_1 = i$).
+  If $|\lambda_1| > |\lambda_2|$ and $\alpha_1 > 0$, $\exists \phi_k$ such that $e^{i\phi_k}v_k$ converges (e.g. $\lambda_1 = i$).
 
-  If $\lambda_k$ is simple, it is unique.
+  If $\lambda_1$ is simple, it is unique.
   Else it depends on the projection of $v_0$ on the space of eigenvectors of $\lambda_1$.
 \end{frame}
 
 \begin{frame}{Strongly Connected Components}
-  \vspace{-.5cm}
+  \vspace{-.8cm}
   \begin{columns}
     \begin{column}{0.4\textwidth}
       \begin{itemize}
@@ -360,6 +363,7 @@ Non-SCC graphs :
 \end{frame}
 
 \begin{frame}{Actual Web graph}
+  \vspace{-.3cm}
   \begin{columns}
     \begin{column}{0.5\textwidth}
       \begin{itemize}
@@ -491,12 +495,14 @@ Non-SCC graphs :
 
 \begin{frame}[allowframebreaks]{Perron-Frobenius}
   \begin{block}{Irreducible matrix}
-    Let $G_M$ be a directed graph where $(i,j) \in E$ iff $M_{ij} > 0$.
+    Let $G_M$ be a directed graph where $(i,j) \in E$ iff $M_{ij} > 0$ (our web graph is $G_{M^T}$).
     $M$ is irreducible iff $G_M$ is strongly connected.
 
-    In this case, the period of $M$ is the GCD of the lengths of the closed directed paths
-    of $G_M$ or the number $m$ such that $(M^m)_{ii} > 0$ $\forall i$
-    (which will be at the same time for each $i$ since $M$ is irreducible~\cite{kitchens1998symbolic}).
+    If it is irreducible, the period of $M$ is the GCD of the lengths of the closed directed paths
+    of $G_M$
+    \cite[p.~16]{kitchens1998symbolic}.
+    % or the number $m$ such that $(M^m)_{ii} > 0$ $\forall i$
+    %(which will be at the same time for each $i$ since $M$ is irreducible~\cite{kitchens1998symbolic}).
   \end{block}
   \begin{block}{Perron-Frobenius}
     \begin{itemize}
@@ -504,14 +510,27 @@ Non-SCC graphs :
         There is $h$ eigenvalues s.t. $|\lambda_i| = \rho(M)$.
         One of them is positive real and its has an eigenvector with only positive real components.
         They are simple (i.e. $m_a(\lambda_i) = 1$).
-        \[ \min_i \sum_j M_{ij} \leq \rho(M) \leq \max_i \sum_j M_{ij} (= 1 \text{ in our case}) \]
+        \[ \min_j \sum_i M_{ij} \leq \rho(M) \leq \max_j \sum_i M_{ij} (= 1 \text{ in our case}) \]
       \item If $M_{ij} > 0$ $\forall i,j$, everything above is true with $h=1$ since it is irreducible.
         There is one \emph{simple} positive real eigenvalue $\lambda$ with a eigenvector with only positive real components
         such that $|\lambda| > |\lambda_i|$ for all $\lambda_i \neq \lambda$.
     \end{itemize}
-    Since an eigenvector has \emph{positive} real values, if the the $\min \neq \max$,
-    \[ \min_i \sum_j M_{ij} < \rho(M) < \max_i \sum_j M_{ij}. \]
   \end{block}
+  \framebreak
+
+  Since an eigenvector has \emph{positive} real values, if the the $\min \neq \max$,
+  \[ \min_i \sum_j M_{ij} < \rho(M) < \max_i \sum_j M_{ij}. \]
+  \begin{proof}
+    Let $\lambda_1 = \rho(M)$ and $x_1$ with \emph{positive} real values
+    \begin{align*}
+      \lambda_1 x_1 & = Mx_1\\
+      e^T\lambda_1 x_1 & = e^TMx_1\\
+      \lambda_1 \sum_{j=1}^n x_{1;j} & = \sum_{j=1}^n e^T M_{:j} x_{1;j}\\
+      \lambda_1 \sum_{j=1}^n x_{1;j} & = \sum_{j=1}^n \sum_j M_{ij} x_{1;j}\\
+                                     & < \max_i \sum_j M_{ij} \sum_{j=1}^n x_{1;j}\\
+      \lambda_1                      & < \max_i \sum_j M_{ij}.
+    \end{align*}
+  \end{proof}
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Convergence of PageRank}
@@ -529,7 +548,7 @@ Non-SCC graphs :
   \begin{proof}
     We have a DAG of SCC so there exists a SCC with no in arcs, its pages have indices in $I$.
     Let's consider the iteration with $B = M_{I,I}$ and $w=v_I$.
-    If it is not a spider trap, $\max_i \sum_j M_{ij} < 1$.
+    If it is not a spider trap, $\min_j \sum_i M_{ij} < 1$.
     Since $B$ is SC, by Perron-Frobenius,
     \[ 0 < \rho(B) < 1 \]
     $w_k$ converges therefore to 0.
@@ -824,7 +843,7 @@ Non-SCC graphs :
     $$v_{k+1} = (\beta M + (1 - \beta) ee^T/n) v_k.$$
     The interpretation here is: We make $G_{\beta M + (1 - \beta) ee^T/n}$ complete and therefore SC.
     $\beta M + (1-\beta) ee^T$ has positive entries so all $\lambda_i \neq 1$ are s.t. $|\lambda_i| < 1$
-    which gives us the convergence.
+    which gives us the convergence (if $\alpha_0 > 0$).
 
     Since 1 is \emph{simple}, and $e^T v_k = 1$, it is also unique.
   \end{block}
@@ -837,23 +856,24 @@ Non-SCC graphs :
     \begin{proof}
       By contradiction.
       Let $u = \lim_{k \to \infty} v_k$ and node $x$ be a dead end.
-      $u$ has only non-negative entry (by induction, $\mathbb{R}_+$ is closed).
+      $u$ has only non-negative entry (by induction, $\mathbb{R}_+$ is complete).
       $$u = \beta M u + (1 - \beta) e/n$$
       so $u_x \geq (1-\beta)/n$.
       \begin{align*}
         e^Tu & = \beta e^TM u + (1-\beta) e^Te/n\\
              & = \beta e^TM u + (1 - \beta)\\
-             & < e^T u
+             & < 1
       \end{align*}
       because $u_x > 0$ and $(e^TM)_x < 1$.
+      But $e^Tu = 1$ so there is a contradiction.
     \end{proof}
   \end{block}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Speed of convergence}
   \begin{block}{Speed of calculation \cite[p.~12]{langville2004deeper}}
-    If $M$ has spectrum $\{1,\lambda_2,\ldots\}$.
-    the spectrum of $\beta M + (1-\beta)e_S/n$.
+    If $M$ has spectrum $\{1,\lambda_2,\ldots\}$,
+    the spectrum of $\beta M + (1-\beta)e_S/|S|$.
     $\{1,\beta\lambda_2,\beta\lambda_3,\ldots,\beta\lambda_n\}$.
     \begin{proof}
       Consequence that $(1,e)$ is an eigenpair of $M^T$,
@@ -916,31 +936,38 @@ Non-SCC graphs :
 \begin{block}{A new kind of spam}
 \begin{itemize}
 \item Pagerank solved the problem of term spam, spammers look for other ways to get a better score
-\item Link spam : build a set of m supporting pages to increase the rank of a target page t
+\item Link spam : build a set of $m$ supporting pages to increase the rank of a target page $t$
 \end{itemize}
 \end{block}
 \begin{figure}
 \centering
-	%\includegraphics[width=7cm]{SpamFarm.png}
+	\includegraphics[width=7cm]{SpamFarm.png}
 \caption{A spammer's view of the web}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Spam farm analysis}
-\begin{block}{PageRank of the target page}
-\begin{itemize}
-\item Let $x$ be the input PageRank from the rest of the web, $m$ the number of supporting pages and $n$ the size of the web
-\item The PageRank $y$ of $t$ is given by
-$ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
-\item If $\beta=.85$ (classical), $\frac{1}{1-\beta^2} = 3.6$ and $\frac{\beta}{1+\beta} = 0.46$
-\end{itemize}
-\end{block}
+\begin{frame}[allowframebreaks]{Spam farm analysis}
+  \begin{block}{PageRank of the target page}
+    \begin{itemize}
+      \item Let $x$ be the input PageRank from the rest of the web, $m$ the number of supporting pages and $n$ the size of the web
+      \item The PageRank $y$ of $t$ is given by
+        $$y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$$
+      \item If $\beta=.85$ (classical), $\frac{1}{1-\beta^2} = 3.6$ and $\frac{\beta}{1+\beta} = 0.46$
+    \end{itemize}
+  \end{block}
+  \framebreak
+
+  With one link to the outside, it becomes
+  $$y = \frac{x}{1-\beta^2\frac{m}{m+1}}+ \frac{\beta(1-\beta)}{1-\beta^2\frac{m}{m+1}} \frac{m}{n}$$
+  with $\beta=1$
+  $$y = x(m+1)$$
+  Solution by pruning alone is bad, do taxation !
 \end{frame}
 
 \begin{frame}{TrustRank and Spam Mass}
 \begin{block}{TrustRank}
 \begin{itemize}
-\item Topic sensitive applied to a set of pages deemed trustworthy(inaccessible for the spammers)
+\item Topic sensitive applied to a set of pages deemed trustworthy (inaccessible for the spammers)
 \item Trust set determined by humans, or trusted domain names (.gov, .mil in the U.S.)
 \end{itemize}
 \end{block}
@@ -948,7 +975,7 @@ $ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
 \begin{itemize}
 \item Intuition : Portion of the PageRank due to spam
 \item Page $p$ with PageRank $r$ and TrustRank $t$
-\item Spam Mass of $p = \frac{r-t}{t}$
+\item Spam Mass of $p = \frac{r-t}{r}$
 \item Remove pages with a high Spam Mass from results ordering
 \end{itemize}
 \end{block}
@@ -960,10 +987,10 @@ $ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
 \end{frame}
 \begin{frame}{Efficient representation of Transition Matrices}
   % Quentin
-  \begin{block}{URLs and hyperlinks storage}
+  \begin{block}{Pages and hyperlinks storage}
   \begin{itemize}
-    \item Each URLs is associated with an integer
-    \item M is sparse, represent it by its non-zero elements
+    \item Each page is associated with an integer
+    \item $M$ is sparse, represent it by its non-zero elements
     \item For each column : one integer for the out-degree, one integer per non-zero entry
   \end{itemize}
   \end{block}
@@ -1003,7 +1030,7 @@ $ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
     \item Hubs have links to interesting authorities.
     \item Autorities are linked to by good hubs.
   \end{itemize}
-  We take $L^T$ which is \emph{exactly} the adjacency matrix, no division by $l$:
+  We take $L$ which is \emph{exactly} the adjacency matrix, no division by $l$:
   the more you have links the more interesting your are.
   \begin{align*}
     a_{k+1} & = \alpha_k L^T h_k\\
@@ -1012,8 +1039,8 @@ $ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
   where $\alpha_k, \beta_k$ are scaling factors (since the matrix is no more stochastic)
   such that
   \begin{itemize}
-    \item largest element is 1 or
-    \item sum of elements is 1
+    \item largest element remains 1 or
+    \item sum of elements remains 1
   \end{itemize}
 \end{frame}
 
@@ -1025,14 +1052,14 @@ $ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
   Can also be seen by:
   $(L^TL)_{ij} > 0$ iff $i$ and $j$ links to a same page in $G_{L^TL}$.
 
-  Spider traps no more exists and dead ends are not in connected components so affect no one.
+  Spider traps no more exists and dead ends are in their own connected components so affect no one.
 
   In each connected component (except dead ends ones).
-  The diagonal is positive so $h = 1$ (each node has a loop).
-  Convergence is guaranteed.
+  Each node has a loop to itself so $h=1$.
+  Convergence is guaranteed if $\alpha_0 > 0$.
 \end{frame}
 
-\begin{frame}
+\begin{frame}[allowframebreaks]{Bibliography}
   \begin{thebibliography}{10}
       \beamertemplatebookbibitems
     \bibitem{leskovec2014mining}
@@ -1046,12 +1073,6 @@ $ y = \frac{x}{1-\beta^2}+ \frac{\beta}{1+\beta} \frac{m}{n}$
         \newblock {\em Symbolic dynamics: one-sided, two-sided and countable state Markov shifts}.
         \newblock 1998.
         \newblock Springer.
-        \bibitem{GooglePaper}
-        Stanford University
-        \newblock {\em The PageRank Citation Ranking: Bringing Order to the Web}
-        \newblock 1998
-        \newblock  \url{http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf}
-      \beamertemplatearticlebibitems
     \bibitem{ilprints422}
         Lawrence Page and Sergey Brin and Rajeev Motwani and Terry Winograd.
         \newblock {\em The PageRank Citation Ranking: Bringing Order to the Web}.
