@@ -1,0 +1,25 @@
+\begin{thebibliography}{1}
+
+\bibitem{avrachenkov2006effect}
+Konstantin Avrachenkov and Nelly Litvak.
+\newblock The effect of new links on google pagerank.
+\newblock {\em Stochastic Models}, 22(2):319--331, 2006.
+
+\bibitem{avrachenkov2004decomposition}
+Konstantin Avrachenkov, Nelly Litvak, et~al.
+\newblock Decomposition of the google pagerank and optimal linking strategy.
+\newblock 2004.
+
+\bibitem{olsen2010maximizing}
+Martin Olsen.
+\newblock Maximizing pagerank with new backlinks.
+\newblock In {\em Algorithms and Complexity}, pages 37--48. Springer, 2010.
+
+\bibitem{olsen2010constant}
+Martin Olsen, Anastasios Viglas, and Ilia Zvedeniouk.
+\newblock A constant-factor approximation algorithm for the link building
+  problem.
+\newblock In {\em Combinatorial Optimization and Applications}, pages 87--96.
+  Springer, 2010.
+
+\end{thebibliography}

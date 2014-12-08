@@ -1,0 +1,97 @@
+\documentclass{article}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[frenchb]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multirow}
+
+% Math symbols
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+% Numbers and units
+\usepackage{siunitx}
+
+\DeclareMathOperator{\newdiff}{d} % use \dif instead
+\newcommand{\dif}{\newdiff\!}
+\newcommand{\fpart}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\ffpart}[2]{\frac{\partial^2 #1}{\partial #2^2}}
+\newcommand{\fdpart}[3]{\frac{\partial^2 #1}{\partial #2\partial #3}}
+\newcommand{\fdif}[2]{\frac{\dif #1}{\dif #2}}
+\newcommand{\ffdif}[2]{\frac{\dif^2 #1}{\dif #2^2}}
+\newcommand{\constant}{\ensuremath{\mathrm{cst}}}
+
+\DeclareMathOperator{\argmax}{argmax}
+\newcommand{\1}{\mathbf{1}}
+
+\author{Benoît Legat}
+\title{PageRank optimization}
+
+\begin{document}
+
+\maketitle
+
+\section{Reminder}
+We will adopt the transposed notation due to the fact that all papers do so.
+
+So
+\[ \pi_{k+1}^T = \pi_k^T cP + t^T(1-c) \]
+or
+\[ \pi_{k+1}^T = \pi_k^T (cP + \1 t^T(1-c)) \]
+and at the convergence
+\[ \pi^T = \pi^T (cP + \1 t^T(1-c)) \]
+so
+\[ \pi^T = (1-c)\1 t^T(I - cP)^{-1} \]
+where $(1 - cP)^{-1} \triangleq Z$ as we will see later.
+
+\section{The effect of adding links}
+\cite{avrachenkov2004decomposition} show that adding a link
+from $i$ to $j$ always increase the PageRank of $j$.
+The worst case for a page is having no inlinks which gives a PageRank of $(1-c)/n$.
+
+It analyses the decomposition of the web in communities,
+set of pages that does not link to each other (because they are of a difference subject for example).
+This is excellent for parallelizing the computation of PageRank.
+He then proves that a community has no interest in adding link to another community,
+in will decrease its PageRank.
+
+This is an example that show that adding an outlink for a page $p$ can decrease the PageRank of $p$.
+However, it can also increase the PageRank of a page.
+Consider for example the case where $p$ links to a page of another community.
+Adding a link from $p$ to a page that links to $p$ can decrease the number of random surfers that go to this other community and increase the PageRank of $p$.
+
+This gives the intuition to a new information we need about pages.
+When a random surfer is at $q$, it will walk randomly from $q$ and will eventually zap to a random page (which might be $p$ with probability $1/n$).
+Before zapping, this random surfer might already pass through $p$.
+We can define $z_{pq}$ as the expected number of times that a random surfer starting at $q$ pass through $p$ (counted $q$ if $q=p$) before zapping.
+$p$ should rather have outlinks to pages $q$ that have high $z_{pq}$.
+
+It is therefore not so surprising to discover that $z_{pq}$ is actually $e_p^T(I-\beta P)^{-1}e_q$.
+\cite{avrachenkov2006effect} discovers all that and concludes by giving the optimal outlink strategy for a webpage which is having only one outlink pointing to $q^* = \argmax_{p \neq q} z_{pq}$.
+Of course, the best strategy is to only have a self loop but that would mean that $p$ is a spider trap which can be detected.
+If the search engine allows self-loop the optimal strategy is to have 2 links, a self-loop and a link to $q^*$.
+
+\section{Choice of inlinks (aka backlinks)}
+A first question might be to try to optimize the PageRank of a page
+by adding $k$ new link.
+
+\cite{olsen2010maximizing} shows that this problem has no fully polynomial time scheme (FPTAS) if $P \neq NP$ and also show that it is W[1]-hard.
+
+\cite{olsen2010constant} compares the naïve algorithm for this problem and a $r$-Greedy algorithm he develops.
+He shows that the naïve algorithm does not perform very well and he shows a lower bound for the pagerank of its page which is a constant times the best pagerank possible. It is
+\[ \pi_p^G \geq \pi_p^o(1 - \beta^2)(1 - 1/e) \]
+where $p$ is the page for which we try to maximize the PageRank,
+$\pi_p^G$ is the PageRank obtained by its $r$-Greedy algorithm, $\pi_p^o$ is the best PageRank that could be optained, $\beta$ is therelaxation factor and $e$ is the neperian constant.
+For the usual value $\beta = 0.85$, this constant is approximatively $0.175$ which may seems not that good but is not terrible either.
+
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+\end{document}
