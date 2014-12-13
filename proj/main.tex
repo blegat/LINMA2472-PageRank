@@ -28,6 +28,7 @@
 \newcommand{\fdif}[2]{\frac{\dif #1}{\dif #2}}
 \newcommand{\ffdif}[2]{\frac{\dif^2 #1}{\dif #2^2}}
 \newcommand{\constant}{\ensuremath{\mathrm{cst}}}
+\newcommand{\bigoh}{\mathcal{O}}
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -148,6 +149,8 @@ Sadly, this is not so simple. \todo{find a counter example}
 As we will see, the first page of the forward chain could be there not
 because it has a parent in $V$ but because it has many parents with high $v$ even if they are not in $V$.
 
+\subsection{Optimal order with no leak}
+\label{sec:no_leak}
 Let's now have a prelude, showing how we could easily choose the order of the pages in the chain if there were
 no leaking page.
 In that case of course it would be a spider web and the optimal linkage strategy wouldn't be a chain but this derivation is similar
@@ -181,10 +184,84 @@ and therefore
   & = w^T v_P
 \end{align*}
 where $w$ is defined as expected.
-Maximizing this scalar product is trivial using the ``Rearrangement inequality''.
-The order of $w$ gives us therefore immediately the order of our pages in the forward chain.
+We know from \cite{de2008maximizing} that the order of $v_i$ (which is strict) is the same that
+the order of the pages in the chain, i.e.
+\[ v_{n_P} < v_{n_P-1} < \cdots < v_2 < v_1 \]
+where $1$ is the leaking page, $v_2$ is the page before it, ...
 
-\todo[inline]{J'écris le reste demain matin}
+Choosing the order maximizing this scalar product is trivial using the ``Rearrangement inequality''.
+The order of $w$ gives us therefore immediately the order of our pages in the forward chain.
+We can obtain $w$ solving the $n_P$ system $(I - cP^{0_i})v^{0_i} = e_i$.
+This is far better than running $n_P!$ times PageRank.
+
+\subsection{Optimal order}
+Let $l$ be the leak, i.e. $(1,l) \in E$ and $l \in \bar{P}$.
+Wlog, let $l = n_{P}+1$.
+Let $P_P$ be the part of $P$ with only the pages $1, \ldots, n_P$.
+In section~\ref{sec:no_leak},
+\[ (I - cP)v = e_P \]
+implied that
+\[ (I - cP_P)v_P = \1 \]
+since
+\[ P =
+  \begin{pmatrix}
+    P_P & 0\\
+    * & *
+  \end{pmatrix}.
+\]
+where
+\[
+  P_P =
+  \begin{pmatrix}
+    (n+1)^{-1} & (n+1)^{-1} & \cdots & (n+1)^{-1} & (n+1)^{-1}\\
+    n^{-1} & n^{-1} & \cdots & n^{-1} & n^{-1}\\
+           & (n-1)^{-1} & \cdots & (n-1)^{-1} & (n-1)^{-1}\\
+           & & \ddots & \vdots & \vdots\\
+    & & & 1/2 & 1/2
+  \end{pmatrix}
+\]
+
+Now, the $n_P$ first lines of $P$ are
+\[
+  \begin{pmatrix}
+    (n+1)^{-1} & (n+1)^{-1} & \cdots & (n+1)^{-1} & (n+1)^{-1} & 1 & 0 & \cdots & 0\\
+    n^{-1} & n^{-1} & \cdots & n^{-1} & n^{-1} & 0 & 0 & \cdots & 0\\
+           & (n-1)^{-1} & \cdots & (n-1)^{-1} & (n-1)^{-1} & 0 & 0 & \cdots & 0\\
+           & & \ddots & \vdots & \vdots & \vdots & \vdots & & \vdots \\
+           & & & 1/2 & 1/2 & 0 & 0 & \cdots & 0
+  \end{pmatrix}.
+\]
+and therefore
+\[ (I - cP_P)v_P = \1 + c e_1 v_l. \]
+
+But we know that
+\[ v_l = (1-c) \sum_{i \in P} v_i v_l^{0_i}. \]
+Noting
+\[ v_l^0 =
+  \begin{pmatrix}
+    v_l^{0_1} \\ v_l^{0_2} \\ \vdots \\ v_l^{0_{n_P}}
+  \end{pmatrix}
+\]
+we have
+\[ v_l = (1-c) {v_l^0}^T v_P \]
+and consequently
+\[ (I - cP_P)v_P = \1 + c (1-c) e_1 {v_l^0}^T v_P \]
+or
+\[ (I - cP_P - c (1-c) e_1 {v_l^0}^T)v_P = \1. \]
+
+Using Sherman-Morrison, we have
+\begin{align*}
+  (I - cP_P - c (1-c) e_1 {v_l^0}^T)^{-1} & = (I - cP_P)^{-1} + (I - cP_P)^{-1}e_1 c(1-c) \frac{{v_s^0}^T(I-cP_P)^{-1}}{1 - c(1-c){v_s^0}^T(I-cP)^{-1}e_1}\\
+  (I - cP_P - c (1-c) e_1 {v_l^0}^T)^{-1}\1 & = h + g c(1-c) \frac{{v_s^0}^Th}{1 - c(1-c){v_s^0}^Tg}
+\end{align*}
+defining $h,g$ appropriatelly.
+
+We now have to maximize
+\[ w^T \left(h + g c(1-c) \frac{{v_s^0}^Th}{1 - c(1-c){v_s^0}^Tg}\right) \]
+where $h$ and $g$ can be precomputed.
+The only problem is that we have to choose the permutation $\sigma$ that we apply to $w$ and $v_l^0$ (the same !).
+For $v_l^0$, if there is 0 elements, we can have less than $n_P!$ (and the order of the others is trivial to find with rearrangement like before).
+In the worst case we still have $n_P!$ but we do not have to compute the pagerank each time but only evaluating this expression which is $\bigoh(n_P)$ !
 
 \bibliographystyle{plain}
 \bibliography{biblio}
