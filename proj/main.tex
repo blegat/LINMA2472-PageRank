@@ -1,7 +1,7 @@
 \documentclass{article}
 
 \usepackage[utf8x]{inputenc}
-\usepackage[frenchb]{babel}
+\usepackage[english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{fullpage}
@@ -10,6 +10,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{multirow}
+\usepackage{todonotes}
 
 % Math symbols
 \usepackage{amsmath}
@@ -28,8 +29,24 @@
 \newcommand{\ffdif}[2]{\frac{\dif^2 #1}{\dif #2^2}}
 \newcommand{\constant}{\ensuremath{\mathrm{cst}}}
 
-\DeclareMathOperator{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
 \newcommand{\1}{\mathbf{1}}
+
+% Theorem and definitions
+\theoremstyle{definition}
+\newtheorem{mydef}{Définition}
+\newtheorem{mynota}[mydef]{Notation}
+\newtheorem{myprop}[mydef]{Propriétés}
+\newtheorem{myrem}[mydef]{Remarque}
+\newtheorem{myform}[mydef]{Formules}
+\newtheorem{mycorr}[mydef]{Corrolaire}
+\newtheorem{mytheo}[mydef]{Théorème}
+\newtheorem{mylem}[mydef]{Lemme}
+\newtheorem{myexem}[mydef]{Exemple}
+\newtheorem{myineg}[mydef]{Inégalité}
+
+
 
 \author{Benoît Legat}
 \title{PageRank optimization}
@@ -90,6 +107,84 @@ He shows that the naïve algorithm does not perform very well and he shows a low
 where $p$ is the page for which we try to maximize the PageRank,
 $\pi_p^G$ is the PageRank obtained by its $r$-Greedy algorithm, $\pi_p^o$ is the best PageRank that could be optained, $\beta$ is therelaxation factor and $e$ is the neperian constant.
 For the usual value $\beta = 0.85$, this constant is approximatively $0.175$ which may seems not that good but is not terrible either.
+
+\subsection{Best link structure for a set of pages}
+The best link structure has already been discussed for a single node.
+\cite{de2008maximizing} analyses the link structure of the pages in $P$ that maximizes the sum of their PageRanks.
+\todo[inline]{Describe it}
+
+If we want to us this structure in practice a problem remains.
+We do not know in which order the pages need to be in the chain
+nor what is the sinking page (even if we know that is a parent of $P$).
+
+There is a conjecture at the end of \cite{de2008maximizing}.
+Instead of simply proving the conjecture, we will prove a generalization.
+\begin{mytheo}[Partition of the chain]
+  Let $P_1,P_2 \subseteq P$ be a partition of $P$ such that
+  $i \in P_1$ if $i$ has an in-link from $\bar{P}$ and $i \in P_2$
+  otherwise.
+  If $z_i = z_j$ for all $i,j \in P$,
+  then with the optimal link structure,
+  $v_i > v_j$ for all $(i,j) \in P_1 \times P_2$.
+  In other words, in the chain there is first all pages of
+  $P_1$ then all pages of $P_2$.
+  \begin{proof}
+    Let's suppose that their is $(i,j) \in P_1 \times P_2$
+    such that $v_i < v_j$ ($v_i = v_j$ is impossible (see \cite[theorem~12]{de2008maximizing}).
+
+    Then since $z_i = z_j$, we can simulate the situation of swapping $i$ and $j$ in the chain
+    by giving the inlinks of $i$ to $j$.
+    Using \cite[theorem~5]{de2008maximizing}, we see that we increase the PageRank each time we give one of the inlinks since
+    we have each time
+    \[ \delta^Tv = \frac{v_j - v_i}{d} > 0 \]
+    where $d$ is the out-degree of the parent of $i$ for which we change de destination of the link.
+  \end{proof}
+\end{mytheo}
+
+\cite{de2008maximizing} says
+``If this conjecture was true we could also ask if the node $j \in I$ such that
+$(j, i) \in E_{in(P)}$ where $i \in \argmax_k v_k$ belongs to $V$.
+Sadly, this is not so simple. \todo{find a counter example}
+As we will see, the first page of the forward chain could be there not
+because it has a parent in $V$ but because it has many parents with high $v$ even if they are not in $V$.
+
+Let's now have a prelude, showing how we could easily choose the order of the pages in the chain if there were
+no leaking page.
+In that case of course it would be a spider web and the optimal linkage strategy wouldn't be a chain but this derivation is similar
+to the one with a leaking page and helps understand it.
+
+We now try to find the relation between the graph with the forward chain and the basic absorbing graph.
+Let $v^{0_i}$ be the usual $v$ for the basic absorbing graph if the node $i$,
+i.e. $v^{0_i} = (I - cP)e_i$ where the $i$th line of $P$ is $e_i^T$.
+In order to do that, we will introduce $p_{ijk}$ which is the probability that a random walker starting at $j$
+will arrive at $i$ after following $k$ links before zapping.
+We have naturally $p_{iik} = c^k$ since the only out-link of $i$ leads to $i$ in its basic absorbing graph.
+Therefore
+\[ v_i^{0_i} = \sum_{k=0}^\infty c^k = \lim_{k \to \infty} \frac{1-c^k}{1-c} = \frac{1}{1-c}. \]
+For $j \neq i$, we can reuse the value $v_i^{0_i}$ we have just found one we arrive at $i$.
+\[ v_j^{0_i} = \sum_{k=0}^\infty p_{ijk} v_i^{0_i} = \frac{1}{1-c} \sum_{k=0}^\infty p_{ijk}. \]
+
+For our forward chain,
+once we arrive at a page $i \in P$, we use $v_i$.
+So for $j \in \bar{P}$
+\begin{align*}
+  v_j & = \sum_{i \in P} \sum_{k = 0}^\infty p_{ijk} v_i\\
+      & = \sum_{i \in P} v_i \sum_{k = 0}^\infty p_{ijk}\\
+      & = \sum_{i \in P} v_i (1-c) v_j^{0_i}
+\end{align*}
+and therefore
+\begin{align*}
+  \sum_{i \in P} v_i + \sum_{j \in \bar{P}}
+  & = \sum_{i \in P} v_i + \sum_{j \in \bar{P}} \sum_{i \in P} v_i (1-c) v_j^{0_i}\\
+  & = \sum_{i \in P} v_i + \sum_{i \in P} v_i \sum_{j \in \bar{P}} (1-c) v_j^{0_i}\\
+  & = \sum_{i \in P} v_i \left(1 + \sum_{j \in \bar{P}} (1-c) v_j^{0_i}\right)\\
+  & = w^T v_P
+\end{align*}
+where $w$ is defined as expected.
+Maximizing this scalar product is trivial using the ``Rearrangement inequality''.
+The order of $w$ gives us therefore immediately the order of our pages in the forward chain.
+
+\todo[inline]{J'écris le reste demain matin}
 
 \bibliographystyle{plain}
 \bibliography{biblio}

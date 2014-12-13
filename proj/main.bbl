@@ -10,6 +10,11 @@ Konstantin Avrachenkov, Nelly Litvak, et~al.
 \newblock Decomposition of the google pagerank and optimal linking strategy.
 \newblock 2004.
 
+\bibitem{de2008maximizing}
+Cristobald De~Kerchove, Laure Ninove, and Paul Van~Dooren.
+\newblock Maximizing pagerank via outlinks.
+\newblock {\em Linear Algebra and its Applications}, 429(5):1254--1276, 2008.
+
 \bibitem{olsen2010maximizing}
 Martin Olsen.
 \newblock Maximizing pagerank with new backlinks.
