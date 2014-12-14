@@ -49,7 +49,7 @@
 
 
 
-\author{Benoît Legat}
+\author{Benoît Legat \and Quentin Laurent}
 \title{PageRank optimization}
 
 \begin{document}
@@ -68,6 +68,33 @@ and at the convergence
 so
 \[ \pi^T = (1-c)\1 t^T(I - cP)^{-1} \]
 where $(1 - cP)^{-1} \triangleq Z$ as we will see later.
+
+\section{Optimal link structures for various cases}
+In \cite{de2008maximizing} it is demonstrated that the pagerank of a set of pages which maximizes the pagerank of a set $\mathcal{P}$, denoted $\pi^T e_{P}$ has a particular structure.\\
+\begin{mytheo}
+It is stated that for $\mathcal{E}_{in}$, $\mathcal{E}_{\overline{\mathcal{P}}}$ given, if  $\pi^T e_{P}$ is maximal under assumption A, then there exists a permutation of the indices such that 
+$\mathcal{P} = \{1,2, \hdots, n_{\mathcal{P}}\}$,
+$$ v_1 > ... > v_{n_P}>v_{n_{\mathcal{P}}}+1 \geq ... \geq v_n$$
+and $\mathcal{E}_{\mathcal{P}}$ and $\mathcal{E}_{out(\mathcal{P})} $ have the following structure :
+$$\mathcal{E}_{\mathcal{P}} = \{(i,j) \in \mathcal{P}\times \mathcal{P} : j \leq i or j = i+1 \}$$
+$$\mathcal{E}_{out(\mathcal{P})} = \{(n_{\mathcal{P}},n_{\mathcal{P}}+1)\}$$
+\label{thm:optstruct}
+\end{mytheo}
+\subsection{Maximizing the pagerank of a target set}
+It might be more useful to maximize the pagerank of a single page since a single page with a very high pagerank is more likely to appear high on the ordering of a search engine than a set of pages with moderately high pagerank. More generally we might want to consider maximizing the pagerank of a target subset $\mathcal{T} \subset \mathcal{P}$($\mathcal{P}$ is still the set whose outlinks we control).
+We can see that theorem \ref{thm:optstruct} still holds for the links of $\mathcal{E}_{\mathcal{T}}$ and of $\mathcal{E}_{out(\mathcal{T})}$, but we cannot generalize so easily to the links of $\mathcal{E}_{\mathcal{P}\setminus \mathcal{T}}$
+%TODO : examples
+
+\subsection{Maximizing the pagerank without self-links}
+In this case the optimal structure is simply modified by substracting the self links of the optimal structure described in theorem \ref{thm:optstruct}. The theorem 11 and 12 of \cite{de2008maximizing} generalize very easily in this case.
+%TODO : Try to quantify the difference in pagerank in this case.
+\subsection{Controlled set is a singleton}
+In the case of a single node, since we know that $\mathcal{V} = \mathcal{V}_0$, we have that $\mathcal{E}_{out(\mathcal{P})} \subset (i,j) \: s.t. \: j \in \mathcal{V}_0$
+\subsection{Optimal structure with several external outlinks}
+
+
+\subsection{Target set is a singleton}
+
 
 \section{The effect of adding links}
 \cite{avrachenkov2004decomposition} show that adding a link
@@ -266,6 +293,44 @@ In the worst case we still have $n_P!$ but we do not have to compute the pageran
 More generally, since $g$ and $h$ are in the same order \todo{prove it} and because we should maximize both ${v_l^0}^Tg$ and ${v_l^0}^Th$ to have the maximum expression (since $1 > c(1-c){v_l^0}^Tg$\todo{prove it}),
 if there is $i_1, i_2$ for which $w_{i_1}, w_{i_2}$ are in the same order than ${v_l^0}_{i_1}, {v_l^0}_{i_2}$,
 we can deduce the order of $i_1, i_2$ in $g$ and $h$ so in practice we will be able to do a lot better than $n_P!$ using this trick too.
+
+\section{Adding external links}
+In the case where we can add a link in a webpage, such as a forum or any other accessible page, we include the webpage in the controlled set $\mathcal{P}$.\\
+Intuitively, doing so should result in a pagerank rise of the target set, although it is not always the case.
+%TODO : example
+If the target set is a singleton, adding a link towards this singleton does increase its pagerank. But is it the optimal strategy?\\
+When two pages $i$ and $j$ have similar expected number of steps before zapping $v_i$ and $v_j$, we can guess that adding a link from the page with the highest pagerank should yield a better result. How can we prove it? 
+
+\subsection{}
+
+\section{Incomplete information and approximation of z}
+In order to be able to apply those results in the real world, we need to be able to compute the inverse matrix $(I-cP)e_{\mathcal{P}}$. However, this is not such an easy thing to do, given the actual computational power and storage needed. In this section we will partition the set of nodes, $V$ in two sets $\mathcal{L}_1$ and $\mathcal{L}_2$. We are here only interested in the elements $z_{ij}$ of $(I-cP)$ so that $i,j \in \mathcal{L}_1$. \\
+We define $\tilde{P} = \begin{pmatrix}\tilde{P}_1 & 0 \\
+0 & \tilde{P}_2 \end{pmatrix}
+$
+We can see that the matrix $\tilde{P}_1$ is easier to obtain than the whole matrix $P$.
+We can here use Woodbury in order to link $P$ and $\tilde{P}$
+\begin{eqnarray*}
+I-cP & = & I-c\tilde{P} + c(\tilde{P}-P) \\
+(I-cP)^{-1} & = & (I-c\tilde{P})^{-1} + (I-c\tilde{P})^{-1}cU(I-V(I-c\tilde{P})^{-1}cU)^{-1}V(I-c\tilde{P})^{-1}
+\end{eqnarray*}
+where $UV = (\tilde{P}-P)$ 
+\subsection{Case 1 : only one node in each set links to the other set}
+Suppose the two sets $\mathcal{L}_1$ and $\mathcal{L}_2$ are linked by two nodes $l\in \mathcal{L}_1$ and $m \in \mathcal{L}_2$ which point to each other
+$$U = \begin{pmatrix}
+e_{l}  & e_{m} \end{pmatrix}$$
+$$V = \begin{pmatrix}
+\frac{1}{d_{l}(d_{l}-1)} & \hdots & \frac{1}{d_{l}(d_{l}-1)} & \frac{1}{d_{l}(d_{l}-1)} & -\frac{1}{d_l} & 0 & \hdots & 0 \\
+0 &\hdots & 0 & -\frac{1}{d_m} & \frac{1}{d_{m}(d_{m}-1)} & \frac{1}{d_{m}(d_{m}-1)} & \hdots & \frac{1}{d_{m}(d_{m}-1)}\end{pmatrix}$$
+
+On pose $A = c(I-c\tilde{P})^{-1}U$
+$$ A = \begin{pmatrix}
+z_{:l} & z_{:m} 
+\end{pmatrix}$$
+$$VA = $$
+%Assumption : $\forall i,j \in \mathcal{L}_1, k \in \mathcal{L}_2 \: z_{ij} > z_{ik}$\\
+ 
+
 
 \bibliographystyle{plain}
 \bibliography{biblio}
