@@ -251,17 +251,21 @@ or
 
 Using Sherman-Morrison, we have
 \begin{align*}
-  (I - cP_P - c (1-c) e_1 {v_l^0}^T)^{-1} & = (I - cP_P)^{-1} + (I - cP_P)^{-1}e_1 c(1-c) \frac{{v_s^0}^T(I-cP_P)^{-1}}{1 - c(1-c){v_s^0}^T(I-cP)^{-1}e_1}\\
-  (I - cP_P - c (1-c) e_1 {v_l^0}^T)^{-1}\1 & = h + g c(1-c) \frac{{v_s^0}^Th}{1 - c(1-c){v_s^0}^Tg}
+  (I - cP_P - c (1-c) e_1 {v_l^0}^T)^{-1} & = (I - cP_P)^{-1} + (I - cP_P)^{-1}e_1 c(1-c) \frac{{v_l^0}^T(I-cP_P)^{-1}}{1 - c(1-c){v_l^0}^T(I-cP)^{-1}e_1}\\
+  (I - cP_P - c (1-c) e_1 {v_l^0}^T)^{-1}\1 & = h + g c(1-c) \frac{{v_l^0}^Th}{1 - c(1-c){v_l^0}^Tg}
 \end{align*}
 defining $h,g$ appropriatelly.
 
 We now have to maximize
-\[ w^T \left(h + g c(1-c) \frac{{v_s^0}^Th}{1 - c(1-c){v_s^0}^Tg}\right) \]
+\[ w^T \left(h + g c(1-c) \frac{{v_l^0}^Th}{1 - c(1-c){v_l^0}^Tg}\right) \]
 where $h$ and $g$ can be precomputed.
 The only problem is that we have to choose the permutation $\sigma$ that we apply to $w$ and $v_l^0$ (the same !).
 For $v_l^0$, if there is 0 elements, we can have less than $n_P!$ (and the order of the others is trivial to find with rearrangement like before).
 In the worst case we still have $n_P!$ but we do not have to compute the pagerank each time but only evaluating this expression which is $\bigoh(n_P)$ !
+
+More generally, since $g$ and $h$ are in the same order \todo{prove it} and because we should maximize both ${v_l^0}^Tg$ and ${v_l^0}^Th$ to have the maximum expression (since $1 > c(1-c){v_l^0}^Tg$\todo{prove it}),
+if there is $i_1, i_2$ for which $w_{i_1}, w_{i_2}$ are in the same order than ${v_l^0}_{i_1}, {v_l^0}_{i_2}$,
+we can deduce the order of $i_1, i_2$ in $g$ and $h$ so in practice we will be able to do a lot better than $n_P!$ using this trick too.
 
 \bibliographystyle{plain}
 \bibliography{biblio}
