@@ -36,16 +36,16 @@
 
 % Theorem and definitions
 \theoremstyle{definition}
-\newtheorem{mydef}{Définition}
+\newtheorem{mydef}{Definition}
 \newtheorem{mynota}[mydef]{Notation}
-\newtheorem{myprop}[mydef]{Propriétés}
-\newtheorem{myrem}[mydef]{Remarque}
-\newtheorem{myform}[mydef]{Formules}
-\newtheorem{mycorr}[mydef]{Corrolaire}
-\newtheorem{mytheo}[mydef]{Théorème}
-\newtheorem{mylem}[mydef]{Lemme}
-\newtheorem{myexem}[mydef]{Exemple}
-\newtheorem{myineg}[mydef]{Inégalité}
+\newtheorem{myprop}[mydef]{Property}
+\newtheorem{myrem}[mydef]{Remark}
+\newtheorem{myform}[mydef]{Formula}
+\newtheorem{mycorr}[mydef]{Corrolary}
+\newtheorem{mytheo}[mydef]{Theorem}
+\newtheorem{mylem}[mydef]{Lemma}
+\newtheorem{myexem}[mydef]{Example}
+\newtheorem{myineg}[mydef]{Inequality}
 
 
 
@@ -121,6 +121,7 @@ nor what is the sinking page (even if we know that is a parent of $P$).
 There is a conjecture at the end of \cite{de2008maximizing}.
 Instead of simply proving the conjecture, we will prove a generalization.
 \begin{mytheo}[Partition of the chain]
+  \label{theo:partition}
   Let $P_1,P_2 \subseteq P$ be a partition of $P$ such that
   $i \in P_1$ if $i$ has an in-link from $\bar{P}$ and $i \in P_2$
   otherwise.
@@ -177,10 +178,11 @@ So for $j \in \bar{P}$
 \end{align*}
 and therefore
 \begin{align*}
-  \sum_{i \in P} v_i + \sum_{j \in \bar{P}}
-  & = \sum_{i \in P} v_i + \sum_{j \in \bar{P}} \sum_{i \in P} v_i (1-c) v_j^{0_i}\\
-  & = \sum_{i \in P} v_i + \sum_{i \in P} v_i \sum_{j \in \bar{P}} (1-c) v_j^{0_i}\\
-  & = \sum_{i \in P} v_i \left(1 + \sum_{j \in \bar{P}} (1-c) v_j^{0_i}\right)\\
+  z^T v
+  & = \sum_{i \in P} z_i v_i + \sum_{j \in \bar{P}} z_j v_j\\
+  & = \sum_{i \in P} z_i v_i + \sum_{j \in \bar{P}} z_j\sum_{i \in P} v_i (1-c) v_j^{0_i}\\
+  & = \sum_{i \in P} z_i v_i + \sum_{i \in P} v_i \sum_{j \in \bar{P}} (1-c) z_j v_j^{0_i}\\
+  & = \sum_{i \in P} v_i \left(z_i + \sum_{j \in \bar{P}} (1-c) z_jv_j^{0_i}\right)\\
   & = w^T v_P
 \end{align*}
 where $w$ is defined as expected.
@@ -266,6 +268,12 @@ In the worst case we still have $n_P!$ but we do not have to compute the pageran
 More generally, since $g$ and $h$ are in the same order \todo{prove it} and because we should maximize both ${v_l^0}^Tg$ and ${v_l^0}^Th$ to have the maximum expression (since $1 > c(1-c){v_l^0}^Tg$\todo{prove it}),
 if there is $i_1, i_2$ for which $w_{i_1}, w_{i_2}$ are in the same order than ${v_l^0}_{i_1}, {v_l^0}_{i_2}$,
 we can deduce the order of $i_1, i_2$ in $g$ and $h$ so in practice we will be able to do a lot better than $n_P!$ using this trick too.
+
+The theorem~\ref{theo:partition} is a simple consequence of this.
+If $z_{i_1} = z_{i_2}$, $i_2$ has no in-link from $\bar{P}$ and $i_1$ has at least one,
+then we have that
+${v_l^0}_{i_2} = v_l^{0_{i_2}} = 0 < v_l^{0_{i_1}}$ and $w_{i_2} = z_{i_2} < z_{i_1} + \cdots = w_{i_1}$
+which implies that $i_1$ is prior to $i_2$ in the forward chain.
 
 \bibliographystyle{plain}
 \bibliography{biblio}
