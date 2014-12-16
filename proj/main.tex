@@ -168,7 +168,7 @@ We also know from \cite{de2008maximizing} that \(\mathcal{V} \subseteq \{j \in \
 This theorem can be understood intuitively.
 We want the random surfers to be trapped in our spider web.
 But we cannot build a spider trap since that is detected.
-So we leave the smallest possible chance of escate to the random surfer possible.
+So we leave the smallest possible chance of escape to the random surfer possible.
 That means we need to do the most complicated maze possible.
 Complicated in the sense of a \emph{random} surfer which means that he chooses
 the link to follow at random each time, even if he's just in from of the exit.
@@ -189,9 +189,9 @@ However, our intuition tells us that a node that has many incoming random surfer
 of the chain so that they stay in the maze the longest time possible.
 Nevertheless there is a complication with the exit node since there is also an advantage to put the node that are
 likely to be reached from the exit node at the back of the chain.
-These competing arrangement directives is what will prevent us to build find the order easily as we will see.
+These competing arrangement directives is what will prevent us to find the order easily as we will see.
 
-There is a conjecture at the end of \cite{de2008maximizing} that does a first step in that direction.
+There is a conjecture at the end of \cite{de2008maximizing} that makes a first step in that direction.
 It states that the first node of the chain (the one the most at the back), should have at least one in-link from $\overline{\mathcal{P}}$
 if $\mathcal{P}$ has at least one in-link.
 
@@ -237,7 +237,7 @@ The following derivation will show how to find the order of the pages of $\mathc
 on $\mathcal{E}_{\text{in}(\mathcal{P})}$, $\mathcal{E}_{\overline{\mathcal{P}}}$.
 Since we know the optimal structure of $\mathcal{P}$ is a forward chain, we will work with it but
 we do not really use this fact in our derivation.
-Maybe expoiting it would help us further improve the algorithm.
+Maybe exploiting it would help us further improve the algorithm.
 
 \subsection{Optimal order with no leaking node}
 \label{sec:no_leak}
@@ -263,15 +263,15 @@ From the definition we have
 \[ v_{i'}^{0_i} = c v_{i'}^{0_i} \]
 which gives the same result since \(c < 1\).
 
-In order give an interesting result for $j$, we will introduce \(p_{ijk}\) which is the probability that a random surfer starting at \(j \in \overline{\mathcal{P}}\)
+In order to give an interesting result for $j$, we will introduce \(p_{ijk}\) which is the probability that a random surfer starting at \(j \in \overline{\mathcal{P}}\)
 will arrive at \(i \in \mathcal{P}\) after following \(k\) links before zapping in \(\mathcal{G}_0\).
 All the intermediary node must be in \(\overline{\mathcal{P}}\) except the last one which is \(i\).
-We can use this probability to iterate over all path that goes to \(i\).
+We can use this probability to iterate over all path going to \(i\).
 Once we are at $i$, we can reuse the value \(v_i^{0_i}\) we have just found.
 This gives
 \[ v_j^{0_i} = \sum_{k=0}^\infty p_{ijk} v_i^{0_i} = \frac{1}{1-c} \sum_{k=0}^\infty p_{ijk}. \]
 
-Let's try to play this little game on \(\mathcal{G}\) (i.e. the forward chain) now.
+Let's try to play this little game on \(\mathcal{P}\) (i.e. the forward chain) now.
 Note that since $p_{ijk}$ has been defined on $\mathcal{G}_0$, the path from $j$ to $i$ does not go through any node of $\mathcal{P}$.
 For \(j \in \overline{\mathcal{P}}\),
 \begin{align*}
@@ -289,7 +289,7 @@ and therefore
   & = w^T v_\mathcal{P}
 \end{align*}
 where \(w\) is defined as expected.
-We know from \cite{de2008maximizing} that the order of \(v_i\) (which is strict) is the same that
+We know from \cite{de2008maximizing} that the order of \(v_i\) (which is strict) is the same as
 the order of the pages in the chain, i.e.
 \[ v_{\sigma^{-1}(1)} > v_{\sigma^{-1}(2)} > \cdots > v_{\sigma^{-1}(n_\mathcal{P}-1)} > v_{\sigma^{-1}(n_\mathcal{P})} \]
 \(\sigma : \mathcal{N} \to \mathcal{N}\) is a mapping giving the order of the nodes of $\mathcal{P}$ in the chain.
@@ -343,7 +343,7 @@ This is far better than running \(n_\mathcal{P}!\) times PageRank.
 The sytem \((I - cP^{0_i})v^{0_i} = e_i\) is quite bit but it can be solved iteratively using fixed point technique since
 it can be rewritten as
 \[ v^{0_i} = cP^{0_i}v^{0_i} + e_i \]
-whose iteration looks a lot like PageRank's.
+whose iterations look a lot like PageRank's.
 
 \subsection{Optimal order}
 Let \(l\) be the leak, i.e. \(\sigma(n_\mathcal{P},l) \in \mathcal{E}_{\text{out}(\mathcal{P})}\) and \(l \in \overline{\mathcal{P}}\).
@@ -363,7 +363,7 @@ and therefore (here $\tilde{P}$ has a bit changed, its last line contains now no
 
 But we know that
 \[ v_l = (1-c) \sum_{i \in \mathcal{P}} v_i v_l^{0_i}. \]
-Addind the notation ${v_l^0}_i = v_l^{0_i}$ (i.e. we store them in a vector $v_l^0$,
+Adding the notation ${v_l^0}_i = v_l^{0_i}$ (i.e. we store them in a vector $v_l^0$),
 we have
 \[ v_l = (1-c) {v_l^0}^T v_\mathcal{P} \]
 and consequently
