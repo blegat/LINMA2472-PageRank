@@ -325,9 +325,9 @@ where we know that we should have a forward chain, it is
   \begin{pmatrix}
     1/2 & 1/2 & & &\\
     \vdots & \vdots & \ddots & &\\
-    (n-1)^{-1} & (n-1)^{-1} & \cdots & (n-1)^{-1} & \\
-    n^{-1} & n^{-1} & \cdots & n^{-1} & n^{-1}\\
-    n^{-1} & n^{-1} & \cdots & n^{-1} & n^{-1}
+    (n_\mathcal{P}-1)^{-1} & (n_\mathcal{P}-1)^{-1} & \cdots & (n_\mathcal{P}-1)^{-1} & \\
+    n_\mathcal{P}^{-1} & n_\mathcal{P}^{-1} & \cdots & n_\mathcal{P}^{-1} & n_\mathcal{P}^{-1}\\
+    n_\mathcal{P}^{-1} & n_\mathcal{P}^{-1} & \cdots & n_\mathcal{P}^{-1} & n_\mathcal{P}^{-1}
   \end{pmatrix}
 \]
 
@@ -353,13 +353,13 @@ The \(n_\mathcal{P}\) first lines of \(\mathcal{P}_{\sigma^{-1}}\) are now
   \begin{pmatrix}
     1/2 & 1/2 & & & & 0 & 0 & \cdots & 0\\
     \vdots & \vdots & \ddots & & & \vdots & \vdots & & \vdots \\
-    (n-1)^{-1} & (n-1)^{-1} & \cdots & (n-1)^{-1} & & 0 & 0 & \cdots & 0\\
-    n^{-1} & n^{-1} & \cdots & n^{-1} & n^{-1} & 0 & 0 & \cdots & 0\\
-    (n+1)^{-1} & (n+1)^{-1} & \cdots & (n+1)^{-1} & (n+1)^{-1} & 1 & 0 & \cdots & 0\\
+    (n_\mathcal{P}-1)^{-1} & (n_\mathcal{P}-1)^{-1} & \cdots & (n_\mathcal{P}-1)^{-1} & & 0 & 0 & \cdots & 0\\
+    n_\mathcal{P}^{-1} & n_\mathcal{P}^{-1} & \cdots & n_\mathcal{P}^{-1} & n_\mathcal{P}^{-1} & 0 & 0 & \cdots & 0\\
+    (n_\mathcal{P}+1)^{-1} & (n_\mathcal{P}+1)^{-1} & \cdots & (n_\mathcal{P}+1)^{-1} & (n_\mathcal{P}+1)^{-1} & (n_\mathcal{P}+1)^{-1} & 0 & \cdots & 0\\
   \end{pmatrix}.
 \]
-and therefore (here $\tilde{P}$ has a bit changed, its last line contains now now $(n+1)^{-1}$ instead of $n^{-1}$)
-\[ (I - c\tilde{P})u = \1 + c e_{n_\mathcal{P}} v_l. \]
+and therefore (here $\tilde{P}$ has a bit changed, its last line contains now $(n_\mathcal{P}+1)^{-1}$ instead of $n_\mathcal{P}^{-1}$)
+\[ (I - c\tilde{P})u = \1 + c (n_\mathcal{P}+1)^{-1} e_{n_\mathcal{P}} v_l. \]
 
 But we know that
 \[ v_l = (1-c) \sum_{i \in \mathcal{P}} v_i v_l^{0_i}. \]
@@ -367,21 +367,21 @@ Adding the notation ${v_l^0}_i = v_l^{0_i}$ (i.e. we store them in a vector $v_l
 we have
 \[ v_l = (1-c) {v_l^0}^T v_\mathcal{P} \]
 and consequently
-\[ (I - c\tilde{P})u = \1 + c (1-c) e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T u \]
+\[ (I - c\tilde{P})u = \1 + c (1-c) (n_\mathcal{P}+1)^{-1} e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T u \]
 or
-\[ (I - c\tilde{P} - c (1-c) e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T)u = \1. \]
+\[ (I - c\tilde{P} - c (1-c) (n_\mathcal{P}+1)^{-1} e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T)u = \1. \]
 
-Using Sherman-Morrison, we have
+Using Sherman-Morrison, we have, using $C \triangleq c(1-c)(n_\mathcal{P}+1)^{-1}$,
 \begin{align*}
-  (I - c\tilde{P} - c (1-c) e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T)^{-1} & = (I - c\tilde{P})^{-1} + (I - c\tilde{P})^{-1}e_{n_\mathcal{P}} c(1-c) \frac{{v_{l,\sigma^{-1}}^0}^T(I-cP_\mathcal{P})^{-1}}{1 - c(1-c){v_{l,\sigma^{-1}}^0}^T(I-cP)^{-1}e_{n_\mathcal{P}}}\\
-  (I - c\tilde{P} - c (1-c) e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T)^{-1}\1 & = h + g c(1-c) \frac{{v_{l,\sigma^{-1}}^0}^Th}{1 - c(1-c){v_{l,\sigma^{-1}}^0}^Tg}
+  (I - c\tilde{P} - C e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T)^{-1} & = (I - c\tilde{P})^{-1} + (I - c\tilde{P})^{-1}e_{n_\mathcal{P}} C \frac{{v_{l,\sigma^{-1}}^0}^T(I-cP_\mathcal{P})^{-1}}{1 - C{v_{l,\sigma^{-1}}^0}^T(I-cP)^{-1}e_{n_\mathcal{P}}}\\
+  (I - c\tilde{P} - C e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T)^{-1}\1 & = h + g C \frac{{v_{l,\sigma^{-1}}^0}^Th}{1 - C {v_{l,\sigma^{-1}}^0}^Tg}
 \end{align*}
 defining \(g \triangleq (I - c\tilde{P})^{-1}e_{n_\mathcal{P}}\) and \(h \triangleq (I - c\tilde{P})^{-1}\1\).
 
 We now have to find $\sigma$ that maximizes
-\[ w_{\sigma^{-1}}^T \left(h + g c(1-c) \frac{{v_{l,\sigma^{-1}}^0}^Th}{1 - c(1-c){v_{l,\sigma^{-1}}^0}^Tg}\right) \]
+\[ w_{\sigma^{-1}}^T \left(h + g C \frac{{v_{l,\sigma^{-1}}^0}^Th}{1 - C {v_{l,\sigma^{-1}}^0}^Tg}\right) \]
 or
-\[ w^T \left(h_\sigma + g_\sigma c(1-c) \frac{{v_l^0}^Th_\sigma}{1 - c(1-c){v_l^0}^Tg_\sigma}\right) \]
+\[ w^T \left(h_\sigma + g_\sigma C \frac{{v_l^0}^Th_\sigma}{1 - C {v_l^0}^Tg_\sigma}\right) \]
 where \(g,h,w,v_l^0\) and \(g\) can be precomputed.
 
 The problem is that we have to choose the \emph{same} permutation \(\sigma\) to apply to \(w\) and \(v_l^0\).
@@ -421,8 +421,8 @@ He shows that the naïve algorithm does not perform very well and he shows a low
 \[ \pi_p^G \geq \pi_p^o(1 - c^2)(1 - 1/e) \]
 
 where $p$ is the page for which we try to maximize the PageRank,
-$\pi_p^G$ is the PageRank obtained by its $r$-Greedy algorithm, $\pi_p^o$ is the best PageRank that could be optained, $\beta$ is the relaxation factor and $e$ is the neperian constant.
-For the usual value $\beta = 0.85$, this constant is approximatively $0.175$ which may seems not that good but is not terrible either.
+$\pi_p^G$ is the PageRank obtained by its $r$-Greedy algorithm, $\pi_p^o$ is the best PageRank that could be optained, $c$ is the relaxation factor and $e$ is the neperian constant.
+For the usual value $c = 0.85$, this constant is approximatively $0.175$ which may seems not that good but is not terrible either.
 
 \subsection{Adding links only from one external node}
 If the target set is a singleton, adding a link towards this singleton does increase its pagerank. But given is it the optimal strategy? It would indeed appear that the best thing we can do by adding a link from a site is add a link from the site to $\argmax_{v_k}$
@@ -434,7 +434,7 @@ $$ \delta^Tv = \frac{1}{d_{j}+1}\left(v_i-\sum_{k\leftarrow j}\frac{v_k}{d_j}\ri
 It is obvious that this expression is maximal for an adequate choice of $i$, i.e. $i = \argmax_{v_l} l$. Nevertheless, it is not guaranteed that this expression will be positive.\\
 In this case, either we do not allow the reordering of the pages and we use the previously computed optimal permutation and it is sufficient to calculate $v^{0_1}_{l}$ and see whether this yield a better result. Or we can reorder the chain of the set $\mathcal{P}$. In this case it is much more difficult to determine the best result since we have to compute $v^{0_1}_{l}$ for each permutation and see which one is best.
 
-\section{Incomplete information and approximation of z}
+\section{Incomplete information and approximation of $z$}
 In order to be able to apply those results in the real world, we need to be able to compute the inverse matrix \((I-cP)e_{\mathcal{P}}\). However, this is not such an easy thing to do, given the actual computational power and storage needed. In this section we will partition the set of nodes, \(V\) in two sets \(\mathcal{L}_1\) and \(\mathcal{L}_2\). We are here only interested in the elements \(z_{ij}\) of \((I-cP)\) so that \(i,j \in \mathcal{L}_1\).
 
 Coming soon... (or not)
