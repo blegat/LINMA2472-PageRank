@@ -57,22 +57,24 @@
 \maketitle
 
 \section{Introduction and notations}
-The importance of a node in a graph is often measured by its pagerank. One of the application domain is the ordering of pagest in the world wide web. It is legitimate for the owner of a particular site to seek the optimal pagerank for his webpage(s). We will examine which alternatives are to be considered in order to get an optimal solution for the sums of the pageranks of a set of pages.\\
-We formerly introduced pagerank, and in \cite{leskovec}, we saw there ways of dealing with dangling nodes or spider traps, i.e. nodes or groups of nodes without outlinks. Since those nodes are very likely to be removed from the page order, we will see how to maximize a pagerank while still being part of the same strongly connected component.\\
+The importance of a node in a graph is often measured by its pagerank. One of the application domain is the ordering of pages in the world wide web. It is legitimate for the owner of a particular site to seek the optimal pagerank for his webpage(s). We will examine which alternatives are to be considered in order to get an optimal solution for the sums of the pageranks of a set of pages.
+
+We formerly introduced pagerank, and in \cite{leskovec}, we saw there ways of dealing with dangling nodes or spider traps, i.e. nodes or groups of nodes without outlinks. Since those nodes are very likely to be removed from the page order, we will see how to maximize a pagerank while still being part of the same strongly connected component, i.e. not being detected as a spider trap.
 
 It is reasonable to suppose that a page owner only has control over the outlinks of his pages. The notation we are going to introduce is mainly issued from \cite{de2008maximizing}.
-Let $\mathcal{G} = (\mathcal{N},\mathcal{E})$ be the webgraph, with a set of nodes  $\mathcal{N} = \{1,2,...,N\}$ and a set of nodes $\mathcal{E}\subseteq \mathcal{N}\times \mathcal{N}$. \\
+Let $\mathcal{G} = (\mathcal{N},\mathcal{E})$ be the webgraph, with a set of nodes  $\mathcal{N} = \{1,2,...,N\}$ and a set of nodes $\mathcal{E}\subseteq \mathcal{N}\times \mathcal{N}$.
+
 By $j \leftarrow i$ we denote that $(i,j)\in \mathcal{E}$, $i$ is a parent of $j$ and $j$ is a child of $i$. 
-\\
+
 We define the set of the pages of our website as  $\mathcal{P} \subset \mathcal{N}$. Subsequently, we define :
 \begin{eqnarray*}
 \mathcal{E}_{\mathcal{P}} & = & \{(i,j)\in \mathcal{E} : i,j \in \mathcal{P}\} \text{ the set of internal links of }\mathcal{P} \text{ (controlled)} \\
-\mathcal{E}_{out(\mathcal{P})} & = & \{(i,j)\in \mathcal{E} : i \in \mathcal{P},j \in \overline{\mathcal{P}}\} \text{ the set of outlinks of }\mathcal{P} \text{ (controlled)}\\
-\mathcal{E}_{in(\mathcal{P})} & = & \{(i,j)\in \mathcal{E} : i \in \overline{\mathcal{P}},j \in \mathcal{P}\} \text{ the set of inlinks of }\mathcal{P} \\
+  \mathcal{E}_{\text{out}(\mathcal{P})} & = & \{(i,j)\in \mathcal{E} : i \in \mathcal{P},j \in \overline{\mathcal{P}}\} \text{ the set of outlinks of }\mathcal{P} \text{ (controlled)}\\
+  \mathcal{E}_{\text{in}(\mathcal{P})} & = & \{(i,j)\in \mathcal{E} : i \in \overline{\mathcal{P}},j \in \mathcal{P}\} \text{ the set of inlinks of }\mathcal{P} \\
 \mathcal{E}_{\overline{\mathcal{P}}} & = & \{(i,j)\in \mathcal{E} : i,j \in \overline{\mathcal{P}}\} \text{ the set of external links} 
 \end{eqnarray*}
 We also make the following assumptions\\
-\textit{Assumption 1 :} Every page of the website has an access to $\overline{\mathcal{P}}$.\\
+\textit{Assumption 1 :} Every page of the website must have access to $\overline{\mathcal{P}}$.\\
 \textit{Assumption 2 :} $\forall i\in \mathcal{N}$, the degree $d_i$ of $i$ is non-zero.\\
 Let's now define the pagerank score (since most article use this notation we found it more convenient to choose it). It is the transpose of the notation used in \cite{leskovec}.
 We define the stochastic matrix $P$ such that :
@@ -88,12 +90,30 @@ Hence the pagerank vector satisfies
 so
 \[ \pi^T = (1-c)\1 z^T(I - cP)^{-1} \]
 where $(1 - cP)^{-1} \triangleq Z$ as we will see later.
-\section{Pagerank of a website}
-Our goal here is to maximize the pagerank of a webpage, represented by the set $\mathcal{P}$. This is given by
+\section{Pagerank of a set of webpages}
+Our goal here is to maximize the sum of the pageranks of a set of webpages, represented by the set $\mathcal{P}$. This is given by
 $$\pi^Te_{\mathcal{P}} = \sum_{i\in \mathcal{P}}\pi_i$$
 $$\pi^Te_{\mathcal{P}} = (1-c)z^Tv$$
-with $e_{\mathcal{P}}$ is the vector with a $1$ in the entry of $\mathcal{P}$ and a $0$ elsewhere, and $v = Ze_{\mathcal{P}}$.\\
-As explained in \cite{de2008maximizing}, the vector $v$ can be viewed as the expected number of visits to the set $\mathcal{P}$ before zapping(with probability $(1-c)$).
+with $e_{\mathcal{P}}$ is the vector with a $1$ in the entry of $\mathcal{P}$ and a $0$ elsewhere, and $v \triangleq Ze_{\mathcal{P}}$.
+
+As mentioned in \cite{de2008maximizing}, the vector $v$ can be viewed as the expected number of visits to the set $\mathcal{P}$ before zapping (with probability $(1-c)$).
+It can be explained very easily by looking at its definition
+\[ v = (I - cP)^{-1} e_{\mathcal{P}}. \]
+This implies that
+\[ v = e_{\mathcal{P}} + cPv \]
+so for $i \in \mathcal{P}$, we have
+\[ v_i = 1 + c \sum_{j \leftarrow i} \frac{v_j}{d_i} \]
+so $v_i$ is 1 (because it is at $i \in \mathcal{P}$ which counts as 1 visit in $\mathcal{P}$ without zapping)
+added with the probability that it doesn't zap, i.e. $c$, multiplied by the sum over its childs $j$ of the number of visit without zapping if it goes at $j$ multiplied
+by the probability that it goes at $j$, i.e. $1/d_i$.
+
+For $i \in \mathcal{P}$, we have
+\[ v_i = c \sum_{j \leftarrow i} \frac{v_j}{d_i} \]
+which has the same interpretation except that we do not add 1 because we are not visiting a node of $\mathcal{P}$.
+
+We will see that it is much more convenient to work with $v$ than with $\pi$.
+$\pi$ can be viewed as a baked cookie and $v$ as the cookie dough which is a lot easier to manipulate
+while $\pi$ is just good to eat.
 
 \section{The effect of adding links}
 \cite{avrachenkov2004decomposition} shows that adding a link
@@ -103,42 +123,52 @@ The worst case for a page is to have no inlinks which gives it a PageRank of $(1
 It analyses the decomposition of the web in communities, i.e.
 sets of pages that do not link to each other (because they treat of a different subject for example).
 This is excellent for parallelizing the computation of PageRank.
-He then proves that a community has no interest in adding a link to another community, since it will decrease its PageRank.\\
+He then proves that a community has no interest in adding a link to another community, since it will decrease its PageRank.
 
 This is a simple example showing that adding an outlink from a page $p$ can decrease the PageRank of $p$.
-However, it can also increase the PageRank of a page.
-Consider for example the case where $p$ links to a page of another community.
-Adding a link from $p$ to a page that links to $p$ can decrease the number of random surfers that go to this other community and increase the PageRank of $p$.
-\todo{Pas clair}
+However, it can also increase it.
+Consider for example, two community: the community of pages about cookies and the community of pages about cosmology.
+If a page $p$ that talks about cosmology makes a metaphor about the cooking of cookies, it might link to a page of the other community.
+This will leak random surfers from its community and will likely decrease its pagerank.
+If the writer of this article get a bit more serious and add another reference to a page in cosmology, the probability to follow the link that leads to the art of cooking cookies decreases which increases the pagerank of $p$.
+This shows that the 2 cases are possible.
+
 This gives the intuition to a new information we need about pages.
 When a random surfer is at $q$, it will walk randomly from $q$ and will eventually zap to a random page (which might be $p$ with probability $1/n$).
 Before zapping, this random surfer might already pass through $p$.
 We can define $z_{pq}$ as the expected number of times that a random surfer starting at $q$ passes through $p$ (counted $q$ if $q=p$) before zapping.
 $p$ should rather have outlinks to pages $q$ that have high $z_{pq}$.
+This looks like the vector $v$ we have defined earlier !
+This is actualy the $v_q$ for $\mathcal{P} = \{p\}$, i.e. $z_{pq} = e_q^T(I-cP)^{-1}e_{\{p\}}$.
 
-It is therefore not so surprising to discover that $z_{pq}$ is actually $e_p^T(I-\beta P)^{-1}e_q$.
-\cite{avrachenkov2006effect} discovers all that and concludes by giving the optimal outlink strategy for a webpage, which is having only one outlink pointing to $q^* = \argmax_{p \neq q} z_{pq}$.
+\cite{avrachenkov2006effect} discovers all that and concludes by giving the optimal outlink strategy for a webpage,
+which has only one outlink pointing to $q^* \in \argmax_{p \neq q} z_{pq}$.
 Of course, the best strategy is to only have a self loop but that would mean that $p$ is a spider trap which can be detected.
 If the search engine allows self-loop the optimal strategy is to have 2 links, a self-loop and a link to $q^*$.
+If $|\argmax_{p \neq q} z_{pq}| > 1$, there is several possibilities which are necessarily all optimal.
 
 
 
 \section{Best link structure for a set of pages}
 The best link structure has already been discussed for a single node.
-In \cite{de2008maximizing} it is demonstrated that the pagerank of a set of pages which maximizes the pagerank of a set $\mathcal{P}$, denoted $\pi^T e_{P}$ has a particular structure.\\
+In \cite{de2008maximizing} it is demonstrated that the subgraph of a set of pages which maximizes the PageRank of a set $\mathcal{P}$, denoted $\pi^T e_{\mathcal{P}}$ has a particular structure.
+
 \begin{mytheo}
-It is stated that for $\mathcal{E}_{in}$, $\mathcal{E}_{\overline{\mathcal{P}}}$ given, if  $\pi^T e_{P}$ is maximal under assumption 1 and 2, then there exists a permutation of the indices such that 
+  It is stated that for $\mathcal{E}_{\text{in}(\mathcal{P})}$, $\mathcal{E}_{\overline{\mathcal{P}}}$ given, if  $\pi^T e_{\mathcal{P}}$ is maximal under assumption 1 and 2, then there exists a permutation of the indices such that 
 $\mathcal{P} = \{1,2, \hdots, n_{\mathcal{P}}\}$,
-$$ v_1 > ... > v_{n_P}>v_{n_{\mathcal{P}}}+1 \geq ... \geq v_n$$
-and $\mathcal{E}_{\mathcal{P}}$ and $\mathcal{E}_{out(\mathcal{P})} $ have the following structure :
+$$ v_1 > ... > v_{n_P}>v_{n_{\mathcal{P}}+1} \geq ... \geq v_n$$
+and $\mathcal{E}_{\mathcal{P}}$ and $\mathcal{E}_{\text{out}(\mathcal{P})} $ have the following structure :
 $$\mathcal{E}_{\mathcal{P}} = \{(i,j) \in \mathcal{P}\times \mathcal{P} : j \leq i \text{ or }j = i+1 \}$$
-$$\mathcal{E}_{out(\mathcal{P})} = \{(n_{\mathcal{P}},n_{\mathcal{P}}+1)\}$$
+$$\mathcal{E}_{\text{out}(\mathcal{P})} = \{(n_{\mathcal{P}},n_{\mathcal{P}}+1)\}$$
+We also know from \cite{de2008maximizing} that $n_\mathcal{P}+1 \in \mathcal{V}$ where
+\[ \mathcal{V} = \argmax_{j \in \overline{\mathcal{P}}} v_j. \]
+We also know from \cite{de2008maximizing} that $\mathcal{V} \subseteq \{j \in \overline{\mathcal{P}} | \exists i \in \mathcal{P} : i \leftarrow j\}$, the parents of $\mathcal{P}$.
 \label{thm:optstruct}
 \end{mytheo}
 
 If we want to use this structure in practice, a problem remains.
 We do not know in which order the pages need to be in the chain
-nor which is the sinking page (even if we know that it points to a parent of $P$).\\
+nor which is the sinking page (even if we know that it points to a parent of $\mathcal{P}$).
 
 There is a conjecture at the end of \cite{de2008maximizing}.
 Instead of simply proving the conjecture, we will prove a generalization.
@@ -164,13 +194,13 @@ Instead of simply proving the conjecture, we will prove a generalization.
     where $d$ is the out-degree of the parent of $i$ for which we change de destination of the link.
   \end{proof}
 \end{mytheo}
-We also define $\mathcal{V} = argmax_{j\in \overline{\mathcal{P}}}v_j$. \\
+
 \cite{de2008maximizing} says
 ``If this conjecture was true we could also ask if the node $j \in \mathcal{P}$ belongs to $\mathcal{V}$ if $j$ is such that
-$(j, i) \in \mathcal{E}_{in(\mathcal{P})}$ where $i \in \argmax_k v_k$ ''.
+$(j, i) \in \mathcal{E}_{\text{in}(\mathcal{P})}$ where $i \in \argmax_k v_k$ ''.
 Sadly, this is not so simple. \todo{find a counter example}\\
 As we will see, the first page of the forward chain could be there not
-because it has a parent in $V$ but because it has many parents with high $v$ even if they are not in $V$.
+because it has a parent in $\mathcal{V}$ but because it has many parents with high $v$ even if they are not in $\mathcal{V}$.
 
 \subsection{Maximizing the pagerank without self-links}
 In this case the optimal structure is simply modified by substracting the self links of the optimal structure described in theorem \ref{thm:optstruct}. The theorem 11 and 12 of \cite{de2008maximizing} generalize very easily in this case.
@@ -185,11 +215,11 @@ Let's now have a prelude, showing how we could easily choose the order of the pa
 no leaking pages.
 In that case, our set of pages would of course be a spider trap and the optimal linkage strategy wouldn't be a chain, but this derivation is similar
 to the one with a leaking page and helps to its understanding.\\
-We define the basic absorbing graph relative to the set $\mathcal{P}$ of our graph as $\mathcal{G}_0=(\mathcal{N},\mathcal{E}^0)$, where $\mathcal{E}_{out(\mathcal{P})}^0 = \emptyset$,$\mathcal{E}^0_{\mathcal{P}}=\{(i,i):i\in \mathcal{P}\},\mathcal{E}_{in(\mathcal{P})}^0 = \mathcal{E}_{in(\mathcal{P})}$ and $ \mathcal{E}^0_{\overline{\mathcal{P}}}=\mathcal{E}_{\overline{\mathcal{P}}}$.\\
+We define the basic absorbing graph relative to the set $\mathcal{P}$ of our graph as $\mathcal{G}_0=(\mathcal{N},\mathcal{E}^0)$, where $\mathcal{E}_{\text{out}(\mathcal{P})}^0 = \emptyset$,$\mathcal{E}^0_{\mathcal{P}}=\{(i,i):i\in \mathcal{P}\},\mathcal{E}_{\text{in}(\mathcal{P})}^0 = \mathcal{E}_{\text{in}(\mathcal{P})}$ and $ \mathcal{E}^0_{\overline{\mathcal{P}}}=\mathcal{E}_{\overline{\mathcal{P}}}$.\\
 We now try to find the relation between the graph with the forward chain and the basic absorbing graph.
 Let $v^{0_i}$ be the usual $v$ for the basic absorbing graph relative to $i$,
 i.e. $v^{0_i} = (I - cP)^{-1}e_i$ where the $i$th line of $P$ is $e_i^T$.
-In order to do that, we will introduce $p_{ijk}$ which is the probability that a random walker starting at $j$
+In order to do that, we will introduce $p_{ijk}$ which is the probability that a random surfer starting at $j$
 will arrive at $i$ after following $k$ links before zapping.
 We have naturally $p_{iik} = c^k$ since the only out-link of $i$ leads to $i$ in its basic absorbing graph.
 Therefore
