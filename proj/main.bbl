@@ -15,6 +15,11 @@ Cristobald De~Kerchove, Laure Ninove, and Paul Van~Dooren.
 \newblock Maximizing pagerank via outlinks.
 \newblock {\em Linear Algebra and its Applications}, 429(5):1254--1276, 2008.
 
+\bibitem{leskovec}
+J.D.~Ullman J.Leskovec, A.Rajaraman.
+\newblock {\em Mining of massive datasets}.
+\newblock 2014.
+
 \bibitem{olsen2010maximizing}
 Martin Olsen.
 \newblock Maximizing pagerank with new backlinks.

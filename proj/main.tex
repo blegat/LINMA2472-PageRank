@@ -57,277 +57,384 @@
 \maketitle
 
 \section{Introduction and notations}
-The importance of a node in a graph is often measured by its pagerank. One of the application domain is the ordering of pagest in the world wide web. It is legitimate for the owner of a particular site to seek the optimal pagerank for his webpage(s). We will examine which alternatives are to be considered in order to get an optimal solution for the sums of the pageranks of a set of pages.\\
-We formerly introduced pagerank, and in \cite{leskovec}, we saw there ways of dealing with dangling nodes or spider traps, i.e. nodes or groups of nodes without outlinks. Since those nodes are very likely to be removed from the page order, we will see how to maximize a pagerank while still being part of the same strongly connected component.\\
+The importance of a node in a graph is often measured by its pagerank. One of the application domain is the ordering of pages in the world wide web. It is legitimate for the owner of a particular site to seek the optimal pagerank for his webpage(s). We will examine which alternatives are to be considered in order to get an optimal solution for the sums of the pageranks of a set of pages.
+
+We formerly introduced pagerank, and in \cite{leskovec}, we saw there ways of dealing with dangling nodes or spider traps, i.e. nodes or groups of nodes without outlinks. Since those nodes are very likely to be removed from the page order, we will see how to maximize a pagerank while still being part of the same strongly connected component, i.e. not being detected as a spider trap.
 
 It is reasonable to suppose that a page owner only has control over the outlinks of his pages. The notation we are going to introduce is mainly issued from \cite{de2008maximizing}.
-Let $\mathcal{G} = (\mathcal{N},\mathcal{E})$ be the webgraph, with a set of nodes  $\mathcal{N} = \{1,2,...,N\}$ and a set of nodes $\mathcal{E}\subseteq \mathcal{N}\times \mathcal{N}$. \\
-By $j \leftarrow i$ we denote that $(i,j)\in \mathcal{E}$, $i$ is a parent of $j$ and $j$ is a child of $i$. 
-\\
-We define the set of the pages of our website as  $\mathcal{P} \subset \mathcal{N}$. Subsequently, we define :
+Let \(\mathcal{G} = (\mathcal{N},\mathcal{E})\) be the webgraph, with a set of nodes  \(\mathcal{N} = \{1,2,...,N\}\) and a set of nodes \(\mathcal{E}\subseteq \mathcal{N}\times \mathcal{N}\).
+
+By \(j \leftarrow i\) we denote that \((i,j)\in \mathcal{E}\), \(i\) is a parent of \(j\) and \(j\) is a child of \(i\).
+
+We define the set of the pages of our website as  \(\mathcal{P} \subset \mathcal{N}\). Subsequently, we define :
 \begin{eqnarray*}
 \mathcal{E}_{\mathcal{P}} & = & \{(i,j)\in \mathcal{E} : i,j \in \mathcal{P}\} \text{ the set of internal links of }\mathcal{P} \text{ (controlled)} \\
-\mathcal{E}_{out(\mathcal{P})} & = & \{(i,j)\in \mathcal{E} : i \in \mathcal{P},j \in \overline{\mathcal{P}}\} \text{ the set of outlinks of }\mathcal{P} \text{ (controlled)}\\
-\mathcal{E}_{in(\mathcal{P})} & = & \{(i,j)\in \mathcal{E} : i \in \overline{\mathcal{P}},j \in \mathcal{P}\} \text{ the set of inlinks of }\mathcal{P} \\
-\mathcal{E}_{\overline{\mathcal{P}}} & = & \{(i,j)\in \mathcal{E} : i,j \in \overline{\mathcal{P}}\} \text{ the set of external links} 
+  \mathcal{E}_{\text{out}(\mathcal{P})} & = & \{(i,j)\in \mathcal{E} : i \in \mathcal{P},j \in \overline{\mathcal{P}}\} \text{ the set of outlinks of }\mathcal{P} \text{ (controlled)}\\
+  \mathcal{E}_{\text{in}(\mathcal{P})} & = & \{(i,j)\in \mathcal{E} : i \in \overline{\mathcal{P}},j \in \mathcal{P}\} \text{ the set of inlinks of }\mathcal{P} \\
+\mathcal{E}_{\overline{\mathcal{P}}} & = & \{(i,j)\in \mathcal{E} : i,j \in \overline{\mathcal{P}}\} \text{ the set of external links}
 \end{eqnarray*}
 We also make the following assumptions\\
-\textit{Assumption 1 :} Every page of the website has an access to $\overline{\mathcal{P}}$.\\
-\textit{Assumption 2 :} $\forall i\in \mathcal{N}$, the degree $d_i$ of $i$ is non-zero.\\
+\textit{Assumption 1 :} Every page of the website must have access to \(\overline{\mathcal{P}}\).\\
+\textit{Assumption 2 :} \(\forall i\in \mathcal{N}\), the degree \(d_i\) of \(i\) is non-zero.\\
 Let's now define the pagerank score (since most article use this notation we found it more convenient to choose it). It is the transpose of the notation used in \cite{leskovec}.
-We define the stochastic matrix $P$ such that :
-$$ P_{ij} = \left\lbrace \begin{array}{ll}
+We define the stochastic matrix \(P\) such that :
+\[ P_{ij} = \left\lbrace \begin{array}{ll}
 d_i^{-1} & \text{if }(i,j)\in \mathcal{E} \\
 0 & \text{otherwise}
 \end{array}
-\right.$$
-Let also $0<c<1$ be a damping factor and $z$ be a positive stochastic personalization vector($z^T \mathbf{1} = 1$ and $z_i>0 \:\forall i = 1,...,n$).
+\right.\]
+Let also \(0<c<1\) be a damping factor and \(z\) be a positive stochastic personalization vector(\(z^T \mathbf{1} = 1\) and \(z_i>0 \:\forall i = 1,...,n\)).
 
 Hence the pagerank vector satisfies
 \[ \pi^T = \pi^T (cP + \1 z^T(1-c)) \]
 so
 \[ \pi^T = (1-c)\1 z^T(I - cP)^{-1} \]
-where $(1 - cP)^{-1} \triangleq Z$ as we will see later.
-\section{Pagerank of a website}
-Our goal here is to maximize the pagerank of a webpage, represented by the set $\mathcal{P}$. This is given by
-$$\pi^Te_{\mathcal{P}} = \sum_{i\in \mathcal{P}}\pi_i$$
-$$\pi^Te_{\mathcal{P}} = (1-c)z^Tv$$
-with $e_{\mathcal{P}}$ is the vector with a $1$ in the entry of $\mathcal{P}$ and a $0$ elsewhere, and $v = Ze_{\mathcal{P}}$.\\
-As explained in \cite{de2008maximizing}, the vector $v$ can be viewed as the expected number of visits to the set $\mathcal{P}$ before zapping(with probability $(1-c)$).
+where \((1 - cP)^{-1} \triangleq Z\) as we will see later.
+\section{Pagerank of a set of webpages}
+Our goal here is to maximize the sum of the pageranks of a set of webpages, represented by the set \(\mathcal{P}\). This is given by
+\[\pi^Te_{\mathcal{P}} = \sum_{i\in \mathcal{P}}\pi_i\]
+\[\pi^Te_{\mathcal{P}} = (1-c)z^Tv\]
+with \(e_{\mathcal{P}}\) is the vector with a \(1\) in the entry of \(\mathcal{P}\) and a \(0\) elsewhere, and \(v \triangleq Ze_{\mathcal{P}}\).
+
+As mentioned in \cite{de2008maximizing}, the vector \(v\) can be viewed as the expected number of visits to the set \(\mathcal{P}\) before zapping (with probability \((1-c)\)).
+It can be explained very easily by looking at its definition
+\[ v = (I - cP)^{-1} e_{\mathcal{P}}. \]
+This implies that
+\[ v = e_{\mathcal{P}} + cPv \]
+so for \(i \in \mathcal{P}\), we have
+\[ v_i = 1 + c \sum_{j \leftarrow i} \frac{v_j}{d_i} \]
+so \(v_i\) is 1 (because it is at \(i \in \mathcal{P}\) which counts as 1 visit in \(\mathcal{P}\) without zapping)
+added with the probability that it doesn't zap, i.e. \(c\), multiplied by the sum over its childs \(j\) of the number of visit without zapping if it goes at \(j\) multiplied
+by the probability that it goes at \(j\), i.e. \(1/d_i\).
+
+For \(i \in \mathcal{P}\), we have
+\[ v_i = c \sum_{j \leftarrow i} \frac{v_j}{d_i} \]
+which has the same interpretation except that we do not add 1 because we are not visiting a node of \(\mathcal{P}\).
+
+We will see that it is much more convenient to work with \(v\) than with \(\pi\).
+\(\pi\) can be viewed as a baked cookie and \(v\) as the cookie dough which is a lot easier to manipulate
+while \(\pi\) is just good to eat.
 
 \section{The effect of adding links}
 \cite{avrachenkov2004decomposition} shows that adding a link
-from $i$ to $j$ always increases the PageRank of $j$.
-The worst case for a page is to have no inlinks which gives it a PageRank of $(1-c)/n$.
+from \(i\) to \(j\) always increases the PageRank of \(j\).
+The worst case for a page is to have no inlinks which gives it a PageRank of \((1-c)/n\).
 
 It analyses the decomposition of the web in communities, i.e.
 sets of pages that do not link to each other (because they treat of a different subject for example).
 This is excellent for parallelizing the computation of PageRank.
-He then proves that a community has no interest in adding a link to another community, since it will decrease its PageRank.\\
+He then proves that a community has no interest in adding a link to another community, since it will decrease its PageRank.
 
-This is a simple example showing that adding an outlink from a page $p$ can decrease the PageRank of $p$.
-However, it can also increase the PageRank of a page.
-Consider for example the case where $p$ links to a page of another community.
-Adding a link from $p$ to a page that links to $p$ can decrease the number of random surfers that go to this other community and increase the PageRank of $p$.
-\todo{Pas clair}
+This is a simple example showing that adding an outlink from a page \(p\) can decrease the PageRank of \(p\).
+However, it can also increase it.
+Consider for example, two community: the community of pages about cookies and the community of pages about cosmology.
+If a page \(p\) that talks about cosmology makes a metaphor about the cooking of cookies, it might link to a page of the other community.
+This will leak random surfers from its community and will likely decrease its PageRank.
+If the writer of this article get a bit more serious and add another reference to a page in cosmology, the probability to follow the link that leads to the art of cooking cookies decreases which increases the pagerank of \(p\).
+This shows that the 2 cases are possible.
+
 This gives the intuition to a new information we need about pages.
-When a random surfer is at $q$, it will walk randomly from $q$ and will eventually zap to a random page (which might be $p$ with probability $1/n$).
-Before zapping, this random surfer might already pass through $p$.
-We can define $z_{pq}$ as the expected number of times that a random surfer starting at $q$ passes through $p$ (counted $q$ if $q=p$) before zapping.
-$p$ should rather have outlinks to pages $q$ that have high $z_{pq}$.
+When a random surfer is at \(q\), it will walk randomly from \(q\) and will eventually zap to a random page (which might be \(p\) with probability \(1/n\)).
+Before zapping, this random surfer might already pass through \(p\).
+We can define \(z_{pq}\) as the expected number of times that a random surfer starting at \(q\) passes through \(p\) (counted \(q\) if \(q=p\)) before zapping.
+\(p\) should rather have outlinks to pages \(q\) that have high \(z_{pq}\).
+This looks like the vector \(v\) we have defined earlier !
+This is actualy the \(v_q\) for \(\mathcal{P} = \{p\}\), i.e. \(z_{pq} = e_q^T(I-cP)^{-1}e_{\{p\}}\).
 
-It is therefore not so surprising to discover that $z_{pq}$ is actually $e_p^T(I-\beta P)^{-1}e_q$.
-\cite{avrachenkov2006effect} discovers all that and concludes by giving the optimal outlink strategy for a webpage, which is having only one outlink pointing to $q^* = \argmax_{p \neq q} z_{pq}$.
-Of course, the best strategy is to only have a self loop but that would mean that $p$ is a spider trap which can be detected.
-If the search engine allows self-loop the optimal strategy is to have 2 links, a self-loop and a link to $q^*$.
+\cite{avrachenkov2006effect} discovers all that and concludes by giving the optimal outlink strategy for a webpage,
+which has only one outlink pointing to \(q^* \in \argmax_{p \neq q} z_{pq}\).
+Of course, the best strategy is to only have a self loop but that would mean that \(p\) is a spider trap which can be detected.
+If the search engine allows self-loop the optimal strategy is to have 2 links, a self-loop and a link to \(q^*\).
+If \(|\argmax_{p \neq q} z_{pq}| > 1\), there is several possibilities which are necessarily all optimal.
 
 
 
 \section{Best link structure for a set of pages}
 The best link structure has already been discussed for a single node.
-In \cite{de2008maximizing} it is demonstrated that the pagerank of a set of pages which maximizes the pagerank of a set $\mathcal{P}$, denoted $\pi^T e_{P}$ has a particular structure.\\
+In \cite{de2008maximizing} it is demonstrated that the subgraph of a set of pages which maximizes the PageRank of a set \(\mathcal{P}\), denoted \(\pi^T e_{\mathcal{P}}\) has a particular structure.
+
 \begin{mytheo}
-It is stated that for $\mathcal{E}_{in}$, $\mathcal{E}_{\overline{\mathcal{P}}}$ given, if  $\pi^T e_{P}$ is maximal under assumption 1 and 2, then there exists a permutation of the indices such that 
-$\mathcal{P} = \{1,2, \hdots, n_{\mathcal{P}}\}$,
-$$ v_1 > ... > v_{n_P}>v_{n_{\mathcal{P}}}+1 \geq ... \geq v_n$$
-and $\mathcal{E}_{\mathcal{P}}$ and $\mathcal{E}_{out(\mathcal{P})} $ have the following structure :
-$$\mathcal{E}_{\mathcal{P}} = \{(i,j) \in \mathcal{P}\times \mathcal{P} : j \leq i \text{ or }j = i+1 \}$$
-$$\mathcal{E}_{out(\mathcal{P})} = \{(n_{\mathcal{P}},n_{\mathcal{P}}+1)\}$$
+  It is stated that for \(\mathcal{E}_{\text{in}(\mathcal{P})}\), \(\mathcal{E}_{\overline{\mathcal{P}}}\) given, if  \(\pi^T e_{\mathcal{P}}\) is maximal under assumption 1 and 2, then there exists a permutation of the indices such that
+\(\mathcal{P} = \{1,2, \hdots, n_{\mathcal{P}}\}\),
+\[ v_1 > ... > v_{n_\mathcal{P}}>v_{n_{\mathcal{P}}+1} \geq ... \geq v_n\]
+and \(\mathcal{E}_{\mathcal{P}}\) and \(\mathcal{E}_{\text{out}(\mathcal{P})} \) have the following structure :
+\[\mathcal{E}_{\mathcal{P}} = \{(i,j) \in \mathcal{P}\times \mathcal{P} : j \leq i \text{ or }j = i+1 \}\]
+\[\mathcal{E}_{\text{out}(\mathcal{P})} = \{(n_{\mathcal{P}},n_{\mathcal{P}}+1)\}\]
+We also know from \cite{de2008maximizing} that \(n_\mathcal{P}+1 \in \mathcal{V}\) where
+\[ \mathcal{V} = \argmax_{j \in \overline{\mathcal{P}}} v_j. \]
+We also know from \cite{de2008maximizing} that \(\mathcal{V} \subseteq \{j \in \overline{\mathcal{P}} | \exists i \in \mathcal{P} : i \leftarrow j\}\), the parents of \(\mathcal{P}\).
 \label{thm:optstruct}
 \end{mytheo}
 
+This theorem can be understood intuitively.
+We want the random surfers to be trapped in our our spider web.
+But we cannot do a spider trap since that is detected.
+So we leave the smallest possible chance of escate to the random surfer possible.
+That means we need to do the most complicated maze possible.
+Complicated in the sense of a \emph{random} surfer which means that he chooses
+the link to follow at random each time, even if he's just in from of the exit.
+
+The most complicated maze is a forward chain for which the last node of the chain has a leak to an external node (the exit)
+and all the nodes in the chain have a link to all the previous nodes of the chain.
+These decrease the probability of the random surfer to go forward the chain and adds a probability for it to go backward.
+Obviously there is no link from a node to another node next in the chain (except the link to the node just next to it that is part of the chain of course) because that would be a shortcut in the maze.
+
+The ``exit'' node should be a node for which there is a high probability to go back in the chain as soon as possible and get trapped in the chain the longer as possible (i.e. enter the chain at the most backward node possible).
+which explains why it should be in $\mathcal{V}$.
+
 If we want to use this structure in practice, a problem remains.
 We do not know in which order the pages need to be in the chain
-nor which is the sinking page (even if we know that it points to a parent of $P$).\\
+nor which is the sinking page (even if we know that it points to a parent of \(\mathcal{P}\)).
 
-There is a conjecture at the end of \cite{de2008maximizing}.
-Instead of simply proving the conjecture, we will prove a generalization.
+However, our intuition tells us that a node that has many incoming random surfers should be at the back
+of the chain so that they stay in the maze the longest time possible.
+Nevertheless there is a complication with the exit node since there is also an advantage to put the node that are
+likely to be reached from the exit node at the back of the chain.
+These competing arrangement directives is what will prevent us to build find the order easily as we will see.
+
+There is a conjecture at the end of \cite{de2008maximizing} that does a first step in that direction.
+It states that the first node of the chain (the one the most at the back), should have at least one in-link from $\overline{\mathcal{P}}$
+if $\mathcal{P}$ has at least one in-link.
+
+Instead of simply proving the conjecture, we will prove a generalization
+which says that in the chain, the nodes that have at least one in-link from $\overline{\mathcal{P}}$ appears first at the back
+followed by the others that have no in-links from $\overline{\mathcal{P}}$.
 \begin{mytheo}[Partition of the chain]
   \label{theo:partition}
-  Let $P_1,P_2 \subseteq P$ be a partition of $P$ such that
-  $i \in P_1$ if $i$ has an in-link from $\bar{P}$ and $i \in P_2$
+  Let \(\mathcal{P}_1,\mathcal{P}_2 \subseteq \mathcal{P}\) be a partition of \(\mathcal{P}\) such that
+  \(i \in \mathcal{P}_1\) if \(i\) has an in-link from \(\overline{\mathcal{P}}\) and \(i \in \mathcal{P}_2\)
   otherwise.
-  If $z_i = z_j$ for all $i,j \in P$,
+  If \(z_i = z_j\) for all \(i,j \in \mathcal{P}\),
   then with the optimal link structure,
-  $v_i > v_j$ for all $(i,j) \in P_1 \times P_2$.
+  \(v_i > v_j\) for all \((i,j) \in \mathcal{P}_1 \times \mathcal{P}_2\).
   In other words, in the chain there is first all pages of
-  $P_1$ then all pages of $P_2$.
+  \(\mathcal{P}_1\) then all pages of \(\mathcal{P}_2\).
   \begin{proof}
-    Let's suppose that their is $(i,j) \in P_1 \times P_2$
-    such that $v_i < v_j$ ($v_i = v_j$ is impossible (see theorem \ref{thm:optstruct})).
+    Let's suppose that their is \((i,j) \in \mathcal{P}_1 \times \mathcal{P}_2\)
+    such that \(v_i < v_j\) (\(v_i = v_j\) is impossible (see theorem \ref{thm:optstruct})).
 
-    Then since $z_i = z_j$, we can simulate the situation of swapping $i$ and $j$ in the chain
-    by giving the inlinks of $i$ to $j$.
+    Then since \(z_i = z_j\), we can simulate the situation of swapping \(i\) and \(j\) in the chain
+    by giving the inlinks of \(i\) to \(j\).
     Using \cite[theorem~5]{de2008maximizing}, we see that we increase the PageRank each time we give one of the inlinks since
     we have each time
     \[ \delta^Tv = \frac{v_j - v_i}{d} > 0 \]
-    where $d$ is the out-degree of the parent of $i$ for which we change de destination of the link.
+    where \(d\) is the out-degree of the parent of \(i\) for which we change de destination of the link.
   \end{proof}
 \end{mytheo}
-We also define $\mathcal{V} = argmax_{j\in \overline{\mathcal{P}}}v_j$. \\
+
 \cite{de2008maximizing} says
-``If this conjecture was true we could also ask if the node $j \in \mathcal{P}$ belongs to $\mathcal{V}$ if $j$ is such that
-$(j, i) \in \mathcal{E}_{in(\mathcal{P})}$ where $i \in \argmax_k v_k$ ''.
+``If this conjecture was true we could also ask if the node \(j \in \mathcal{P}\) belongs to \(\mathcal{V}\) if \(j\) is such that
+\((j, i) \in \mathcal{E}_{\text{in}(\mathcal{P})}\) where \(i \in \argmax_k v_k\) ''.
 Sadly, this is not so simple. \todo{find a counter example}\\
 As we will see, the first page of the forward chain could be there not
-because it has a parent in $V$ but because it has many parents with high $v$ even if they are not in $V$.
+because it has a parent in \(\mathcal{V}\) but because it has many parents with high \(v\) even if they are not in \(\mathcal{V}\).
 
 \subsection{Maximizing the pagerank without self-links}
 In this case the optimal structure is simply modified by substracting the self links of the optimal structure described in theorem \ref{thm:optstruct}. The theorem 11 and 12 of \cite{de2008maximizing} generalize very easily in this case.
 
 
 \section{Optimal order}
+The following derivation will show how to find the order of the pages of $\mathcal{P}$ in the chain, depending
+on $\mathcal{E}_{\text{in}(\mathcal{P})}$, $\mathcal{E}_{\overline{\mathcal{P}}}$.
+Since we know the optimal structure of $\mathcal{P}$ is a forward chain, we will work with it but
+we do not really use this fact in our derivation.
+Maybe expoiting it would help us further improve the algorithm.
+
 \subsection{Optimal order with no leaking node}
 \label{sec:no_leak}
 Let's now have a prelude, showing how we could easily choose the order of the pages in the chain if there were
 no leaking pages.
-In that case, our set of pages would of course be a spider trap and the optimal linkage strategy wouldn't be a chain, but this derivation is similar
-to the one with a leaking page and helps to its understanding.\\
-We define the basic absorbing graph relative to the set $\mathcal{P}$ of our graph as $\mathcal{G}_0=(\mathcal{N},\mathcal{E}^0)$, where $\mathcal{E}_{out(\mathcal{P})}^0 = \emptyset$,$\mathcal{E}^0_{\mathcal{P}}=\{(i,i):i\in \mathcal{P}\},\mathcal{E}_{in(\mathcal{P})}^0 = \mathcal{E}_{in(\mathcal{P})}$ and $ \mathcal{E}^0_{\overline{\mathcal{P}}}=\mathcal{E}_{\overline{\mathcal{P}}}$.\\
+In that case, our set of pages would of course be a spider trap and the optimal linkage strategy doesn't have to be a chain, but this derivation is similar
+to the one with a leaking page and helps to its understanding.
+
+We define the basic absorbing graph relative to the set \(\mathcal{P}\) of our graph as \(\mathcal{G}_0=(\mathcal{N},\mathcal{E}^0)\), where \(\mathcal{E}_{\text{out}(\mathcal{P})}^0 = \emptyset\),\(\mathcal{E}^0_{\mathcal{P}}=\{(i,i):i\in \mathcal{P}\},\mathcal{E}_{\text{in}(\mathcal{P})}^0 = \mathcal{E}_{\text{in}(\mathcal{P})}\) and \( \mathcal{E}^0_{\overline{\mathcal{P}}}=\mathcal{E}_{\overline{\mathcal{P}}}\).
+
 We now try to find the relation between the graph with the forward chain and the basic absorbing graph.
-Let $v^{0_i}$ be the usual $v$ for the basic absorbing graph relative to $i$,
-i.e. $v^{0_i} = (I - cP)^{-1}e_i$ where the $i$th line of $P$ is $e_i^T$.
-In order to do that, we will introduce $p_{ijk}$ which is the probability that a random walker starting at $j$
-will arrive at $i$ after following $k$ links before zapping.
-We have naturally $p_{iik} = c^k$ since the only out-link of $i$ leads to $i$ in its basic absorbing graph.
-Therefore
+Let \(v^{0_i}\) be the usual \(v\) for the basic absorbing graph with $\mathcal{P} = \{i\}$,
+i.e. \(v^{0_i} = (I - cP_{\mathcal{G}_0})^{-1}e_i\).
+We have naturally
 \[ v_i^{0_i} = \sum_{k=0}^\infty c^k = \lim_{k \to \infty} \frac{1-c^k}{1-c} = \frac{1}{1-c}. \]
-For $j \neq i$, we can reuse the value $v_i^{0_i}$ we have just found one we arrive at $i$.
+or simply from the definition of $v$
+\[ v_i^{0_i} = 1 + c v_i^{0_i} \]
+which give the same result.
+Obviously,
+\[ v_{i'}^{0_i} = 0 \]
+for $i \neq i' \in \mathcal{P}$ since a random surfer starting at $i'$ just stays at $i'$.
+From the definition we have
+\[ v_{i'}^{0_i} = c v_{i'}^{0_i} \]
+which gives the same result since \(c < 1\).
+
+In order give an interesting result for $j$, we will introduce \(p_{ijk}\) which is the probability that a random surfer starting at \(j \in \overline{\mathcal{P}}\)
+will arrive at \(i \in \mathcal{P}\) after following \(k\) links before zapping in \(\mathcal{G}_0\).
+All the intermediary node must be in \(\overline{\mathcal{P}}\) except the last one which is \(i\).
+We can use this probability to iterate over all path that goes to \(i\).
+Once we are at $i$, we can reuse the value \(v_i^{0_i}\) we have just found.
+This gives
 \[ v_j^{0_i} = \sum_{k=0}^\infty p_{ijk} v_i^{0_i} = \frac{1}{1-c} \sum_{k=0}^\infty p_{ijk}. \]
 
-For our forward chain,
-once we arrive at a page $i \in P$, we use $v_i$.
-So for $j \in \bar{P}$
+Let's try to play this little game on \(\mathcal{G}\) (i.e. the forward chain) now.
+Note that since $p_{ijk}$ has been defined on $\mathcal{G}_0$, the path from $j$ to $i$ does not go through any node of $\mathcal{P}$.
+For \(j \in \overline{\mathcal{P}}\),
 \begin{align*}
-  v_j & = \sum_{i \in P} \sum_{k = 0}^\infty p_{ijk} v_i\\
-      & = \sum_{i \in P} v_i \sum_{k = 0}^\infty p_{ijk}\\
-      & = \sum_{i \in P} v_i (1-c) v_j^{0_i}
+  v_j & = \sum_{i \in \mathcal{P}} \sum_{k = 0}^\infty p_{ijk} v_i\\
+      & = \sum_{i \in \mathcal{P}} v_i \sum_{k = 0}^\infty p_{ijk}\\
+      & = (1-c) \sum_{i \in \mathcal{P}} v_i v_j^{0_i}
 \end{align*}
 and therefore
 \begin{align*}
   z^T v
-  & = \sum_{i \in P} z_i v_i + \sum_{j \in \bar{P}} z_j v_j\\
-  & = \sum_{i \in P} z_i v_i + \sum_{j \in \bar{P}} z_j\sum_{i \in P} v_i (1-c) v_j^{0_i}\\
-  & = \sum_{i \in P} z_i v_i + \sum_{i \in P} v_i \sum_{j \in \bar{P}} (1-c) z_j v_j^{0_i}\\
-  & = \sum_{i \in P} v_i \left(z_i + \sum_{j \in \bar{P}} (1-c) z_jv_j^{0_i}\right)\\
-  & = w^T v_P
+  & = \sum_{i \in \mathcal{P}} z_i v_i + \sum_{j \in \overline{\mathcal{P}}} z_j v_j\\
+  & = \sum_{i \in \mathcal{P}} z_i v_i + \sum_{j \in \overline{\mathcal{P}}} z_j (1-c) \sum_{i \in \mathcal{P}} v_i v_j^{0_i}\\
+  & = \sum_{i \in \mathcal{P}} z_i v_i + \sum_{i \in \mathcal{P}} v_i (1-c) \sum_{j \in \overline{\mathcal{P}}} z_j v_j^{0_i}\\
+  & = \sum_{i \in \mathcal{P}} v_i \left(z_i + (1-c) \sum_{j \in \overline{\mathcal{P}}} z_jv_j^{0_i}\right)\\
+  & = w^T v_\mathcal{P}
 \end{align*}
-where $w$ is defined as expected.
-We know from \cite{de2008maximizing} that the order of $v_i$ (which is strict) is the same that
+where \(w\) is defined as expected.
+We know from \cite{de2008maximizing} that the order of \(v_i\) (which is strict) is the same that
 the order of the pages in the chain, i.e.
-\[ v_{n_P} < v_{n_P-1} < \cdots < v_2 < v_1 \]
-where $1$ is the leaking page, $v_2$ is the page before it, ...
+\[ v_{\sigma^{-1}(1)} > v_{\sigma^{-1}(2)} > \cdots > v_{\sigma^{-1}(n_\mathcal{P}-1)} > v_{\sigma^{-1}(n_\mathcal{P})} \]
+\(\sigma : \mathcal{N} \to \mathcal{N}\) is a mapping giving the order of the nodes of $\mathcal{P}$ in the chain.
+Its image for the $j \in \mathcal{P}$ doesn't matter much,
+we just need $\sigma$ to be a bijection and that \(\sigma(\mathcal{P}) = \{1, \ldots, n_\mathcal{P}\}\).
 
-Choosing the order maximizing this scalar product is trivial using the ``Rearrangement inequality''.
-The order of $w$ gives us therefore immediately the order of our pages in the forward chain.
-We can obtain $w$ solving the $n_P$ system $(I - cP^{0_i})v^{0_i} = e_i$.
-This is far better than running $n_P!$ times PageRank.
+Since there is no leak, $v_{\sigma^{-1}(i)}$ for $i \in \mathcal{P}$ does not depend on the rest of the graph and can be precomputed as \(u\).
+$v_\mathcal{P}$ is therefore simply $u_\sigma$, which means that $v_i = u_{\sigma(i)}$ for $i \in \mathcal{P}$.
 
-\subsection{Optimal order}
-Let $l$ be the leak, i.e. $(1,l) \in E$ and $l \in \bar{P}$.
-Wlog, let $l = n_{P}+1$.
-Let $P_P$ be the part of $P$ with only the pages $1, \ldots, n_P$.
-In section~\ref{sec:no_leak},
-\[ (I - cP)v = e_P \]
-implied that
-\[ (I - cP_P)v_P = \1 \]
-since
-\[ P =
+The independence of $u$ can be shown by analysing $P_{\sigma^{-1}}$, the matrix with columns and row permutted according to $\sigma$.
+\[ P_\sigma =
   \begin{pmatrix}
-    P_P & 0\\
+    \tilde{P} & 0\\
     * & *
   \end{pmatrix}.
 \]
-where
+
+Rewriting
+\[ (I - cP)v = e_\mathcal{P} \]
+as
+\[ (I - cP_{\sigma^{-1}})
+\begin{pmatrix}
+u\\
+*
+\end{pmatrix}
+= e_{\{1,\ldots,n\}} \]
+shows that
+\[ (I - c\tilde{P})u = \1 \]
+where $\tilde{P}$ is constant and in our case
+where we know that we should have a forward chain, it is
 \[
-  P_P =
+  \tilde{P} =
   \begin{pmatrix}
-    (n+1)^{-1} & (n+1)^{-1} & \cdots & (n+1)^{-1} & (n+1)^{-1}\\
+    1/2 & 1/2 & & &\\
+    \vdots & \vdots & \ddots & &\\
+    (n-1)^{-1} & (n-1)^{-1} & \cdots & (n-1)^{-1} & \\
     n^{-1} & n^{-1} & \cdots & n^{-1} & n^{-1}\\
-           & (n-1)^{-1} & \cdots & (n-1)^{-1} & (n-1)^{-1}\\
-           & & \ddots & \vdots & \vdots\\
-    & & & 1/2 & 1/2
+    n^{-1} & n^{-1} & \cdots & n^{-1} & n^{-1}
   \end{pmatrix}
 \]
 
-Now, the $n_P$ first lines of $P$ are
+The remaining optimization problem is therefore
+\[ \max_\sigma w^T u_\sigma. \]
+
+This problem is known and is solved by ``Rearrangement inequality''.
+The order of \(w\) gives us therefore immediately the order of our pages in the forward chain.
+We can obtain \(w\) solving the \(n_\mathcal{P}\) system \((I - cP^{0_i})v^{0_i} = e_i\)
+and \(u\) solving the system \((I - c\tilde{P})u = \1\).
+This is far better than running \(n_\mathcal{P}!\) times PageRank.
+
+The sytem \((I - cP^{0_i})v^{0_i} = e_i\) is quite bit but it can be solved iteratively using fixed point technique since
+it can be rewritten as
+\[ v^{0_i} = cP^{0_i}v^{0_i} + e_i \]
+whose iteration looks a lot like PageRank's.
+
+\subsection{Optimal order}
+Let \(l\) be the leak, i.e. \(\sigma(n_\mathcal{P},l) \in \mathcal{E}_{\text{out}(\mathcal{P})}\) and \(l \in \overline{\mathcal{P}}\).
+Wlog, let \(\sigma(l) = n_{\mathcal{P}}+1\).
+The \(n_\mathcal{P}\) first lines of \(\mathcal{P}_{\sigma^{-1}}\) are now
 \[
   \begin{pmatrix}
-    (n+1)^{-1} & (n+1)^{-1} & \cdots & (n+1)^{-1} & (n+1)^{-1} & 1 & 0 & \cdots & 0\\
+    1/2 & 1/2 & & & & 0 & 0 & \cdots & 0\\
+    \vdots & \vdots & \ddots & & & \vdots & \vdots & & \vdots \\
+    (n-1)^{-1} & (n-1)^{-1} & \cdots & (n-1)^{-1} & & 0 & 0 & \cdots & 0\\
     n^{-1} & n^{-1} & \cdots & n^{-1} & n^{-1} & 0 & 0 & \cdots & 0\\
-           & (n-1)^{-1} & \cdots & (n-1)^{-1} & (n-1)^{-1} & 0 & 0 & \cdots & 0\\
-           & & \ddots & \vdots & \vdots & \vdots & \vdots & & \vdots \\
-           & & & 1/2 & 1/2 & 0 & 0 & \cdots & 0
+    (n+1)^{-1} & (n+1)^{-1} & \cdots & (n+1)^{-1} & (n+1)^{-1} & 1 & 0 & \cdots & 0\\
   \end{pmatrix}.
 \]
-and therefore
-\[ (I - cP_P)v_P = \1 + c e_1 v_l. \]
+and therefore (here $\tilde{P}$ has a bit changed, its last line contains now now $(n+1)^{-1}$ instead of $n^{-1}$)
+\[ (I - c\tilde{P})u = \1 + c e_{n_\mathcal{P}} v_l. \]
 
 But we know that
-\[ v_l = (1-c) \sum_{i \in P} v_i v_l^{0_i}. \]
-Noting
-\[ v_l^0 =
-  \begin{pmatrix}
-    v_l^{0_1} \\ v_l^{0_2} \\ \vdots \\ v_l^{0_{n_P}}
-  \end{pmatrix}
-\]
+\[ v_l = (1-c) \sum_{i \in \mathcal{P}} v_i v_l^{0_i}. \]
+Addind the notation ${v_l^0}_i = v_l^{0_i}$ (i.e. we store them in a vector $v_l^0$,
 we have
-\[ v_l = (1-c) {v_l^0}^T v_P \]
+\[ v_l = (1-c) {v_l^0}^T v_\mathcal{P} \]
 and consequently
-\[ (I - cP_P)v_P = \1 + c (1-c) e_1 {v_l^0}^T v_P \]
+\[ (I - c\tilde{P})u = \1 + c (1-c) e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T u \]
 or
-\[ (I - cP_P - c (1-c) e_1 {v_l^0}^T)v_P = \1. \]
+\[ (I - c\tilde{P} - c (1-c) e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T)u = \1. \]
 
 Using Sherman-Morrison, we have
 \begin{align*}
-  (I - cP_P - c (1-c) e_1 {v_l^0}^T)^{-1} & = (I - cP_P)^{-1} + (I - cP_P)^{-1}e_1 c(1-c) \frac{{v_l^0}^T(I-cP_P)^{-1}}{1 - c(1-c){v_l^0}^T(I-cP)^{-1}e_1}\\
-  (I - cP_P - c (1-c) e_1 {v_l^0}^T)^{-1}\1 & = h + g c(1-c) \frac{{v_l^0}^Th}{1 - c(1-c){v_l^0}^Tg}
+  (I - c\tilde{P} - c (1-c) e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T)^{-1} & = (I - c\tilde{P})^{-1} + (I - c\tilde{P})^{-1}e_{n_\mathcal{P}} c(1-c) \frac{{v_{l,\sigma^{-1}}^0}^T(I-cP_\mathcal{P})^{-1}}{1 - c(1-c){v_{l,\sigma^{-1}}^0}^T(I-cP)^{-1}e_{n_\mathcal{P}}}\\
+  (I - c\tilde{P} - c (1-c) e_{n_\mathcal{P}} {v_{l,\sigma^{-1}}^0}^T)^{-1}\1 & = h + g c(1-c) \frac{{v_{l,\sigma^{-1}}^0}^Th}{1 - c(1-c){v_{l,\sigma^{-1}}^0}^Tg}
 \end{align*}
-defining $h,g$ appropriatelly.
+defining \(g \triangleq (I - c\tilde{P})^{-1}e_{n_\mathcal{P}}\) and \(h \triangleq (I - c\tilde{P})^{-1}\1\).
 
-We now have to maximize
-\[ w^T \left(h + g c(1-c) \frac{{v_l^0}^Th}{1 - c(1-c){v_l^0}^Tg}\right) \]
-where $h$ and $g$ can be precomputed.
-The only problem is that we have to choose the permutation $\sigma$ that we apply to $w$ and $v_l^0$ (the same !).
-For $v_l^0$, if there is 0 elements, we can have less than $n_P!$ (and the order of the others is trivial to find with rearrangement like before).
-In the worst case we still have $n_P!$ but we do not have to compute the pagerank each time but only evaluating this expression which is $\bigoh(n_P)$ !
+We now have to find $\sigma$ that maximizes
+\[ w_{\sigma^{-1}}^T \left(h + g c(1-c) \frac{{v_{l,\sigma^{-1}}^0}^Th}{1 - c(1-c){v_{l,\sigma^{-1}}^0}^Tg}\right) \]
+or
+\[ w^T \left(h_\sigma + g_\sigma c(1-c) \frac{{v_l^0}^Th_\sigma}{1 - c(1-c){v_l^0}^Tg_\sigma}\right) \]
+where \(g,h,w,v_l^0\) and \(g\) can be precomputed.
 
-More generally, since $g$ and $h$ are in the same order \todo{prove it} and because we should maximize both ${v_l^0}^Tg$ and ${v_l^0}^Th$ to have the maximum expression (since $1 > c(1-c){v_l^0}^Tg$\todo{prove it}),
-if there is $i_1, i_2$ for which $w_{i_1}, w_{i_2}$ are in the same order than ${v_l^0}_{i_1}, {v_l^0}_{i_2}$,
-we can deduce the order of $i_1, i_2$ in $g$ and $h$ so in practice we will be able to do a lot better than $n_P!$ using this trick too.
+The problem is that we have to choose the \emph{same} permutation \(\sigma\) to apply to \(w\) and \(v_l^0\).
+So we cannot use the ``Rearrangement theorem'' separately.
 
+In the worst case we still have the \(n_\mathcal{P}!\) permutations to test
+but we do not have to compute the pagerank each time but only evaluating this expression which is \(\bigoh(n_\mathcal{P})\) !
 
-The theorem~\ref{theo:partition} is a simple consequence of this.
-If $z_{i_1} = z_{i_2}$, $i_2$ has no in-link from $\bar{P}$ and $i_1$ has at least one,
-then we have that
-${v_l^0}_{i_2} = v_l^{0_{i_2}} = 0 < v_l^{0_{i_1}}$ and $w_{i_2} = z_{i_2} < z_{i_1} + \cdots = w_{i_1}$
-which implies that $i_1$ is prior to $i_2$ in the forward chain.
+As we have seen with proof of the conjecture earlier, there are easy cases.
+If some nodes do not have in-links for $\overline{\mathcal{P}}$, we can just put them at the end of the chain and order them
+according to their $w_i = z_i$.
+Actually, even if they have in-links in $\overline{\mathcal{P}}$ but not from $l$,
+we don't care about their order when in $v_l^0$ and we can just find it using the ``Rearrangement inequality'' after thanks to $w$ (this is more generally the case for all groups of elements that have the same values in $v_l^0$).
+
+% More generally, since \(g\) and \(h\) are in the same order \todo{prove it} and because we should maximize both \({v_l^0}^Tg\) and \({v_l^0}^Th\) to have the maximum expression (since \(1 > c(1-c){v_l^0}^Tg\)\todo{prove it}),
+% if there is \(i_1, i_2\) for which \(w_{i_1}, w_{i_2}\) are in the same order than \({v_l^0}_{i_1}, {v_l^0}_{i_2}\),
+% we can deduce the order of \(i_1, i_2\) in \(g\) and \(h\) so in practice we will be able to do a lot better than \(n_\mathcal{P}!\) using this trick too.
+%
+% The theorem~\ref{theo:partition} is a simple consequence of this.
+% If \(z_{i_1} = z_{i_2}\), \(i_2\) has no in-link from \(\overline{\mathcal{P}}\) and \(i_1\) has at least one,
+% then we have that
+% \({v_l^0}_{i_2} = v_l^{0_{i_2}} = 0 < v_l^{0_{i_1}}\) and \(w_{i_2} = z_{i_2} < z_{i_1} + \cdots = w_{i_1}\)
+% which implies that \(i_1\) is prior to \(i_2\) in the forward chain.
+% FIXME In fact ils sont dans le sens inverse l'un de l'autre
 
 \section{Adding new inlinks}
-In the case where we can add a link in a webpage, such as a forum or any other accessible page, we include the webpage in the controlled set $\mathcal{P}$.\\
+In the case where we can add a link in a webpage, such as a forum or any other accessible page, we include the webpage in the controlled set \(\mathcal{P}\).\\
 Intuitively, doing so should result in a pagerank rise of the target set, although it is not always the case.\\
 %TODO : example
 A first question might be to try to optimize the PageRank of a page
-by adding $k$ new link.
+by adding \(k\) new link.
 
-\cite{olsen2010maximizing} shows that this problem has no fully polynomial time scheme (FPTAS) if $P \neq NP$ and also show that it is W[1]-hard.
+\cite{olsen2010maximizing} shows that this problem has no fully polynomial time scheme (FPTAS) if \(P \neq NP\) and also show that it is W[1]-hard.
 
-\cite{olsen2010constant} compares the naïve algorithm for this problem and a $r$-Greedy algorithm he develops.
+\cite{olsen2010constant} compares the naïve algorithm for this problem and a \(r\)-Greedy algorithm he develops.
 He shows that the naïve algorithm does not perform very well and he shows a lower bound for the pagerank of its page which is a constant times the best pagerank possible. It is
 \[ \pi_p^G \geq \pi_p^o(1 - \beta^2)(1 - 1/e) \]
+<<<<<<< HEAD
 where $p$ is the page for which we try to maximize the PageRank,
 $\pi_p^G$ is the PageRank obtained by its $r$-Greedy algorithm, $\pi_p^o$ is the best PageRank that could be optained, $\beta$ is the relaxation factor and $e$ is the neperian constant.
 For the usual value $\beta = 0.85$, this constant is approximatively $0.175$ which may seems not that good but is not terrible either.\\
 \subsection{Adding links only from one external node}
-If the target set is a singleton, adding a link towards this singleton does increase its pagerank. But given is it the optimal strategy? It would indeed appear that the best thing we can do by adding a link from a site is add a link from the site to $argmax_{v_k}$\\ 
+If the target set is a singleton, adding a link towards this singleton does increase its pagerank. But given is it the optimal strategy? It would indeed appear that the best thing we can do by adding a link from a site is add a link from the site to $argmax_{v_k}$ \\ 
 Since adding a link to the set $\mathcal{P}$ consists of a rank-1 perturbation of the transition matrix. From theorem 5 of \cite{de2008maximizing}, if $\delta^Tv>0$ then the perturbation leads to a higher pagerank for the perturbed link structure.\\
 When adding a link from $j \in \overline{\mathcal{P}}$ to a $i \in \mathcal{P}$, we have 
 $$ \delta^Tv = \frac{1}{d_{j}+1}(v_i-\sum_{k\leftarrow j}\frac{v_k}{d_j})$$
 It is obvious that this expression is maximal for an adequate choice of $i$, i.e. $i = argmax_{v_l} l$. Nevertheless, it is not guaranteed that this expression will be positive.\\
 In this case, either we do not allow the reordering of the pages and we use the previously computed optimal permutation and it is sufficient to calculate $v^{0_1}_{l}$ and see whether this yield a better result. Or we can reorder the chain of the set $\mathcal{P}$. In this case it is much more difficult to determine the best result since we have to compute $v^{0_1}_{l}$ for each permutation and see which one is best.
+
 \section{Incomplete information and approximation of z}
-In order to be able to apply those results in the real world, we need to be able to compute the inverse matrix $(I-cP)e_{\mathcal{P}}$. However, this is not such an easy thing to do, given the actual computational power and storage needed. In this section we will partition the set of nodes, $V$ in two sets $\mathcal{L}_1$ and $\mathcal{L}_2$. We are here only interested in the elements $z_{ij}$ of $(I-cP)$ so that $i,j \in \mathcal{L}_1$. \\
-\\
+In order to be able to apply those results in the real world, we need to be able to compute the inverse matrix \((I-cP)e_{\mathcal{P}}\). However, this is not such an easy thing to do, given the actual computational power and storage needed. In this section we will partition the set of nodes, \(V\) in two sets \(\mathcal{L}_1\) and \(\mathcal{L}_2\). We are here only interested in the elements \(z_{ij}\) of \((I-cP)\) so that \(i,j \in \mathcal{L}_1\).
+
 Coming soon... (or not)
 
 \bibliographystyle{plain}
