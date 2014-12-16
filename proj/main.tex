@@ -418,17 +418,20 @@ by adding \(k\) new link.
 
 \cite{olsen2010constant} compares the naïve algorithm for this problem and a \(r\)-Greedy algorithm he develops.
 He shows that the naïve algorithm does not perform very well and he shows a lower bound for the pagerank of its page which is a constant times the best pagerank possible. It is
-\[ \pi_p^G \geq \pi_p^o(1 - \beta^2)(1 - 1/e) \]
-<<<<<<< HEAD
+\[ \pi_p^G \geq \pi_p^o(1 - c^2)(1 - 1/e) \]
+
 where $p$ is the page for which we try to maximize the PageRank,
 $\pi_p^G$ is the PageRank obtained by its $r$-Greedy algorithm, $\pi_p^o$ is the best PageRank that could be optained, $\beta$ is the relaxation factor and $e$ is the neperian constant.
-For the usual value $\beta = 0.85$, this constant is approximatively $0.175$ which may seems not that good but is not terrible either.\\
+For the usual value $\beta = 0.85$, this constant is approximatively $0.175$ which may seems not that good but is not terrible either.
+
 \subsection{Adding links only from one external node}
-If the target set is a singleton, adding a link towards this singleton does increase its pagerank. But given is it the optimal strategy? It would indeed appear that the best thing we can do by adding a link from a site is add a link from the site to $argmax_{v_k}$ \\ 
-Since adding a link to the set $\mathcal{P}$ consists of a rank-1 perturbation of the transition matrix. From theorem 5 of \cite{de2008maximizing}, if $\delta^Tv>0$ then the perturbation leads to a higher pagerank for the perturbed link structure.\\
-When adding a link from $j \in \overline{\mathcal{P}}$ to a $i \in \mathcal{P}$, we have 
-$$ \delta^Tv = \frac{1}{d_{j}+1}(v_i-\sum_{k\leftarrow j}\frac{v_k}{d_j})$$
-It is obvious that this expression is maximal for an adequate choice of $i$, i.e. $i = argmax_{v_l} l$. Nevertheless, it is not guaranteed that this expression will be positive.\\
+If the target set is a singleton, adding a link towards this singleton does increase its pagerank. But given is it the optimal strategy? It would indeed appear that the best thing we can do by adding a link from a site is add a link from the site to $\argmax_{v_k}$
+
+Since adding a link to the set $\mathcal{P}$ consists of a rank-1 perturbation of the transition matrix. From theorem 5 of \cite{de2008maximizing}, if $\delta^Tv>0$ then the perturbation leads to a higher pagerank for the perturbed link structure.
+
+When adding a link from $j \in \overline{\mathcal{P}}$ to a $i \in \mathcal{P}$, we have
+$$ \delta^Tv = \frac{1}{d_{j}+1}\left(v_i-\sum_{k\leftarrow j}\frac{v_k}{d_j}\right)$$
+It is obvious that this expression is maximal for an adequate choice of $i$, i.e. $i = \argmax_{v_l} l$. Nevertheless, it is not guaranteed that this expression will be positive.\\
 In this case, either we do not allow the reordering of the pages and we use the previously computed optimal permutation and it is sufficient to calculate $v^{0_1}_{l}$ and see whether this yield a better result. Or we can reorder the chain of the set $\mathcal{P}$. In this case it is much more difficult to determine the best result since we have to compute $v^{0_1}_{l}$ for each permutation and see which one is best.
 
 \section{Incomplete information and approximation of z}
