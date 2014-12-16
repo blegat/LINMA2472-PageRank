@@ -129,7 +129,7 @@ This is a simple example showing that adding an outlink from a page \(p\) can de
 However, it can also increase it.
 Consider for example, two community: the community of pages about cookies and the community of pages about cosmology.
 If a page \(p\) that talks about cosmology makes a metaphor about the cooking of cookies, it might link to a page of the other community.
-This will leak random surfers from its community and will likely decrease its pagerank.
+This will leak random surfers from its community and will likely decrease its PageRank.
 If the writer of this article get a bit more serious and add another reference to a page in cosmology, the probability to follow the link that leads to the art of cooking cookies decreases which increases the pagerank of \(p\).
 This shows that the 2 cases are possible.
 
@@ -156,7 +156,7 @@ In \cite{de2008maximizing} it is demonstrated that the subgraph of a set of page
 \begin{mytheo}
   It is stated that for \(\mathcal{E}_{\text{in}(\mathcal{P})}\), \(\mathcal{E}_{\overline{\mathcal{P}}}\) given, if  \(\pi^T e_{\mathcal{P}}\) is maximal under assumption 1 and 2, then there exists a permutation of the indices such that
 \(\mathcal{P} = \{1,2, \hdots, n_{\mathcal{P}}\}\),
-\[ v_1 > ... > v_{n_P}>v_{n_{\mathcal{P}}+1} \geq ... \geq v_n\]
+\[ v_1 > ... > v_{n_\mathcal{P}}>v_{n_{\mathcal{P}}+1} \geq ... \geq v_n\]
 and \(\mathcal{E}_{\mathcal{P}}\) and \(\mathcal{E}_{\text{out}(\mathcal{P})} \) have the following structure :
 \[\mathcal{E}_{\mathcal{P}} = \{(i,j) \in \mathcal{P}\times \mathcal{P} : j \leq i \text{ or }j = i+1 \}\]
 \[\mathcal{E}_{\text{out}(\mathcal{P})} = \{(n_{\mathcal{P}},n_{\mathcal{P}}+1)\}\]
@@ -166,24 +166,51 @@ We also know from \cite{de2008maximizing} that \(\mathcal{V} \subseteq \{j \in \
 \label{thm:optstruct}
 \end{mytheo}
 
+This theorem can be understood intuitively.
+We want the random surfers to be trapped in our our spider web.
+But we cannot do a spider trap since that is detected.
+So we leave the smallest possible chance of escate to the random surfer possible.
+That means we need to do the most complicated maze possible.
+Complicated in the sense of a \emph{random} surfer which means that he chooses
+the link to follow at random each time, even if he's just in from of the exit.
+
+The most complicated maze is a forward chain for which the last node of the chain has a leak to an external node (the exit)
+and all the nodes in the chain have a link to all the previous nodes of the chain.
+These decrease the probability of the random surfer to go forward the chain and adds a probability for it to go backward.
+Obviously there is no link from a node to another node next in the chain (except the link to the node just next to it that is part of the chain of course) because that would be a shortcut in the maze.
+
+The ``exit'' node should be a node for which there is a high probability to go back in the chain as soon as possible and get trapped in the chain the longer as possible (i.e. enter the chain at the most backward node possible).
+which explains why it should be in $\mathcal{V}$.
+
 If we want to use this structure in practice, a problem remains.
 We do not know in which order the pages need to be in the chain
 nor which is the sinking page (even if we know that it points to a parent of \(\mathcal{P}\)).
 
-There is a conjecture at the end of \cite{de2008maximizing}.
-Instead of simply proving the conjecture, we will prove a generalization.
+However, our intuition tells us that a node that has many incoming random surfers should be at the back
+of the chain so that they stay in the maze the longest time possible.
+Nevertheless there is a complication with the exit node since there is also an advantage to put the node that are
+likely to be reached from the exit node at the back of the chain.
+These competing arrangement directives is what will prevent us to build find the order easily as we will see.
+
+There is a conjecture at the end of \cite{de2008maximizing} that does a first step in that direction.
+It states that the first node of the chain (the one the most at the back), should have at least one in-link from $\overline{\mathcal{P}}$
+if $\mathcal{P}$ has at least one in-link.
+
+Instead of simply proving the conjecture, we will prove a generalization
+which says that in the chain, the nodes that have at least one in-link from $\overline{\mathcal{P}}$ appears first at the back
+followed by the others that have no in-links from $\overline{\mathcal{P}}$.
 \begin{mytheo}[Partition of the chain]
   \label{theo:partition}
-  Let \(P_1,P_2 \subseteq P\) be a partition of \(P\) such that
-  \(i \in P_1\) if \(i\) has an in-link from \(\bar{P}\) and \(i \in P_2\)
+  Let \(\mathcal{P}_1,\mathcal{P}_2 \subseteq \mathcal{P}\) be a partition of \(\mathcal{P}\) such that
+  \(i \in \mathcal{P}_1\) if \(i\) has an in-link from \(\overline{\mathcal{P}}\) and \(i \in \mathcal{P}_2\)
   otherwise.
-  If \(z_i = z_j\) for all \(i,j \in P\),
+  If \(z_i = z_j\) for all \(i,j \in \mathcal{P}\),
   then with the optimal link structure,
-  \(v_i > v_j\) for all \((i,j) \in P_1 \times P_2\).
+  \(v_i > v_j\) for all \((i,j) \in \mathcal{P}_1 \times \mathcal{P}_2\).
   In other words, in the chain there is first all pages of
-  \(P_1\) then all pages of \(P_2\).
+  \(\mathcal{P}_1\) then all pages of \(\mathcal{P}_2\).
   \begin{proof}
-    Let's suppose that their is \((i,j) \in P_1 \times P_2\)
+    Let's suppose that their is \((i,j) \in \mathcal{P}_1 \times \mathcal{P}_2\)
     such that \(v_i < v_j\) (\(v_i = v_j\) is impossible (see theorem \ref{thm:optstruct})).
 
     Then since \(z_i = z_j\), we can simulate the situation of swapping \(i\) and \(j\) in the chain
@@ -213,9 +240,11 @@ In this case the optimal structure is simply modified by substracting the self l
 \label{sec:no_leak}
 Let's now have a prelude, showing how we could easily choose the order of the pages in the chain if there were
 no leaking pages.
-In that case, our set of pages would of course be a spider trap and the optimal linkage strategy wouldn't be a chain, but this derivation is similar
-to the one with a leaking page and helps to its understanding.\\
-We define the basic absorbing graph relative to the set \(\mathcal{P}\) of our graph as \(\mathcal{G}_0=(\mathcal{N},\mathcal{E}^0)\), where \(\mathcal{E}_{\text{out}(\mathcal{P})}^0 = \emptyset\),\(\mathcal{E}^0_{\mathcal{P}}=\{(i,i):i\in \mathcal{P}\},\mathcal{E}_{\text{in}(\mathcal{P})}^0 = \mathcal{E}_{\text{in}(\mathcal{P})}\) and \( \mathcal{E}^0_{\overline{\mathcal{P}}}=\mathcal{E}_{\overline{\mathcal{P}}}\).\\
+In that case, our set of pages would of course be a spider trap and the optimal linkage strategy doesn't have to be a chain, but this derivation is similar
+to the one with a leaking page and helps to its understanding.
+
+We define the basic absorbing graph relative to the set \(\mathcal{P}\) of our graph as \(\mathcal{G}_0=(\mathcal{N},\mathcal{E}^0)\), where \(\mathcal{E}_{\text{out}(\mathcal{P})}^0 = \emptyset\),\(\mathcal{E}^0_{\mathcal{P}}=\{(i,i):i\in \mathcal{P}\},\mathcal{E}_{\text{in}(\mathcal{P})}^0 = \mathcal{E}_{\text{in}(\mathcal{P})}\) and \( \mathcal{E}^0_{\overline{\mathcal{P}}}=\mathcal{E}_{\overline{\mathcal{P}}}\).
+
 We now try to find the relation between the graph with the forward chain and the basic absorbing graph.
 Let \(v^{0_i}\) be the usual \(v\) for the basic absorbing graph relative to \(i\),
 i.e. \(v^{0_i} = (I - cP)^{-1}e_i\) where the \(i\)th line of \(P\) is \(e_i^T\).
@@ -229,7 +258,7 @@ For \(j \neq i\), we can reuse the value \(v_i^{0_i}\) we have just found one we
 
 For our forward chain,
 once we arrive at a page \(i \in P\), we use \(v_i\).
-So for \(j \in \bar{P}\)
+So for \(j \in \overline{P}\)
 \begin{align*}
   v_j & = \sum_{i \in P} \sum_{k = 0}^\infty p_{ijk} v_i\\
       & = \sum_{i \in P} v_i \sum_{k = 0}^\infty p_{ijk}\\
@@ -238,10 +267,10 @@ So for \(j \in \bar{P}\)
 and therefore
 \begin{align*}
   z^T v
-  & = \sum_{i \in P} z_i v_i + \sum_{j \in \bar{P}} z_j v_j\\
-  & = \sum_{i \in P} z_i v_i + \sum_{j \in \bar{P}} z_j\sum_{i \in P} v_i (1-c) v_j^{0_i}\\
-  & = \sum_{i \in P} z_i v_i + \sum_{i \in P} v_i \sum_{j \in \bar{P}} (1-c) z_j v_j^{0_i}\\
-  & = \sum_{i \in P} v_i \left(z_i + \sum_{j \in \bar{P}} (1-c) z_jv_j^{0_i}\right)\\
+  & = \sum_{i \in P} z_i v_i + \sum_{j \in \overline{P}} z_j v_j\\
+  & = \sum_{i \in P} z_i v_i + \sum_{j \in \overline{P}} z_j\sum_{i \in P} v_i (1-c) v_j^{0_i}\\
+  & = \sum_{i \in P} z_i v_i + \sum_{i \in P} v_i \sum_{j \in \overline{P}} (1-c) z_j v_j^{0_i}\\
+  & = \sum_{i \in P} v_i \left(z_i + \sum_{j \in \overline{P}} (1-c) z_jv_j^{0_i}\right)\\
   & = w^T v_P
 \end{align*}
 where \(w\) is defined as expected.
@@ -256,7 +285,7 @@ We can obtain \(w\) solving the \(n_P\) system \((I - cP^{0_i})v^{0_i} = e_i\).
 This is far better than running \(n_P!\) times PageRank.
 
 \subsection{Optimal order}
-Let \(l\) be the leak, i.e. \((1,l) \in E\) and \(l \in \bar{P}\).
+Let \(l\) be the leak, i.e. \((1,l) \in E\) and \(l \in \overline{P}\).
 Wlog, let \(l = n_{P}+1\).
 Let \(P_P\) be the part of \(P\) with only the pages \(1, \ldots, n_P\).
 In section~\ref{sec:no_leak},
@@ -330,7 +359,7 @@ we can deduce the order of \(i_1, i_2\) in \(g\) and \(h\) so in practice we wil
 
 
 The theorem~\ref{theo:partition} is a simple consequence of this.
-If \(z_{i_1} = z_{i_2}\), \(i_2\) has no in-link from \(\bar{P}\) and \(i_1\) has at least one,
+If \(z_{i_1} = z_{i_2}\), \(i_2\) has no in-link from \(\overline{P}\) and \(i_1\) has at least one,
 then we have that
 \({v_l^0}_{i_2} = v_l^{0_{i_2}} = 0 < v_l^{0_{i_1}}\) and \(w_{i_2} = z_{i_2} < z_{i_1} + \cdots = w_{i_1}\)
 which implies that \(i_1\) is prior to \(i_2\) in the forward chain.
