@@ -61,7 +61,7 @@ The importance of a node in a graph is often measured by its pagerank. One of th
 
 We formerly introduced pagerank, and in \cite{leskovec}, we saw there ways of dealing with dangling nodes or spider traps, i.e. nodes or groups of nodes without outlinks. Since those nodes are very likely to be removed from the page order, we will see how to maximize a pagerank while still being part of the same strongly connected component, i.e. not being detected as a spider trap.
 
-It is reasonable to suppose that a page owner only has control over the outlinks of his pages. The notation we are going to introduce is mainly issued from \cite{de2008maximizing}.
+It is reasonable to suppose that a page owner only has control over the outlinks of his pages. The notation we are going to introduce is mainly borrowed from \cite{de2008maximizing}.
 Let \(\mathcal{G} = (\mathcal{N},\mathcal{E})\) be the webgraph, with a set of nodes  \(\mathcal{N} = \{1,2,...,N\}\) and a set of nodes \(\mathcal{E}\subseteq \mathcal{N}\times \mathcal{N}\).
 
 By \(j \leftarrow i\) we denote that \((i,j)\in \mathcal{E}\), \(i\) is a parent of \(j\) and \(j\) is a child of \(i\).
@@ -76,7 +76,7 @@ We define the set of the pages of our website as  \(\mathcal{P} \subset \mathcal
 We also make the following assumptions\\
 \textit{Assumption 1 :} Every page of the website must have access to \(\overline{\mathcal{P}}\).\\
 \textit{Assumption 2 :} \(\forall i\in \mathcal{N}\), the degree \(d_i\) of \(i\) is non-zero.\\
-Let's now define the pagerank score (since most article use this notation we found it more convenient to choose it). It is the transpose of the notation used in \cite{leskovec}.
+Let's now define the pagerank score. It is the transpose of the notation used in \cite{leskovec}(since most article use this notation we found it more convenient to choose theirs).
 We define the stochastic matrix \(P\) such that :
 \[ P_{ij} = \left\lbrace \begin{array}{ll}
 d_i^{-1} & \text{if }(i,j)\in \mathcal{E} \\
@@ -95,8 +95,7 @@ Our goal here is to maximize the sum of the pageranks of a set of webpages, repr
 \[\pi^Te_{\mathcal{P}} = \sum_{i\in \mathcal{P}}\pi_i\]
 \[\pi^Te_{\mathcal{P}} = (1-c)z^Tv\]
 with \(e_{\mathcal{P}}\) is the vector with a \(1\) in the entry of \(\mathcal{P}\) and a \(0\) elsewhere, and \(v \triangleq Ze_{\mathcal{P}}\).
-
-As mentioned in \cite{de2008maximizing}, the vector \(v\) can be viewed as the expected number of visits to the set \(\mathcal{P}\) before zapping (with probability \((1-c)\)).
+Let's now remember our random surfer model. We remember that when he is on a particular page, he has a probability \(c\) of continuing his walk through one of the outlinks of the page, but he also has a probability \( (1-c)\) of zapping or teleporting to any node of the graph. As mentioned in \cite{de2008maximizing}, the vector \(v\) can be viewed as the expected number of visits to the set \(\mathcal{P}\) before zapping.
 It can be explained very easily by looking at its definition
 \[ v = (I - cP)^{-1} e_{\mathcal{P}}. \]
 This implies that
@@ -127,10 +126,10 @@ He then proves that a community has no interest in adding a link to another comm
 
 This is a simple example showing that adding an outlink from a page \(p\) can decrease the PageRank of \(p\).
 However, it can also increase it.
-Consider for example, two community: the community of pages about cookies and the community of pages about cosmology.
+Consider for example, two communities: the community of pages about cookies and the community of pages about cosmology.
 If a page \(p\) that talks about cosmology makes a metaphor about the cooking of cookies, it might link to a page of the other community.
 This will leak random surfers from its community and will likely decrease its PageRank.
-If the writer of this article get a bit more serious and add another reference to a page in cosmology, the probability to follow the link that leads to the art of cooking cookies decreases which increases the pagerank of \(p\).
+If the writer of this article gets a bit more serious and adds another reference to a page in cosmology, the probability to follow the link that leads to the art of cooking cookies decreases which increases the pagerank of \(p\).
 This shows that the 2 cases are possible.
 
 This gives the intuition to a new information we need about pages.
@@ -145,7 +144,7 @@ This is actualy the \(v_q\) for \(\mathcal{P} = \{p\}\), i.e. \(z_{pq} = e_q^T(I
 which has only one outlink pointing to \(q^* \in \argmax_{p \neq q} z_{pq}\).
 Of course, the best strategy is to only have a self loop but that would mean that \(p\) is a spider trap which can be detected.
 If the search engine allows self-loop the optimal strategy is to have 2 links, a self-loop and a link to \(q^*\).
-If \(|\argmax_{p \neq q} z_{pq}| > 1\), there is several possibilities which are necessarily all optimal.
+If \(|\argmax_{p \neq q} z_{pq}| > 1\), there are several possibilities which are necessarily all optimal.
 
 
 
@@ -167,8 +166,8 @@ We also know from \cite{de2008maximizing} that \(\mathcal{V} \subseteq \{j \in \
 \end{mytheo}
 
 This theorem can be understood intuitively.
-We want the random surfers to be trapped in our our spider web.
-But we cannot do a spider trap since that is detected.
+We want the random surfers to be trapped in our spider web.
+But we cannot build a spider trap since that is detected.
 So we leave the smallest possible chance of escate to the random surfer possible.
 That means we need to do the most complicated maze possible.
 Complicated in the sense of a \emph{random} surfer which means that he chooses
